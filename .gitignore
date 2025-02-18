@@ -1,0 +1,44 @@
+# Rider-specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Build directories
+bin/
+obj/
+gen/
+out/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.ide
+
+# MAUI-specific directories
+**/platforms/ios/Pods/
+**/platforms/ios/.symlinks/
+**/platforms/ios/DerivedData/
+**/platforms/ios/build/
+**/platforms/android/.gradle/
+**/platforms/android/app/build/
+**/platforms/android/gradle/
+**/platforms/android/.idea/
+**/platforms/windows/bin/
+**/platforms/windows/obj/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Logs and temp files
+*.log
+*.temp
+*.tmp
