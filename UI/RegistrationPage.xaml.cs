@@ -17,16 +17,16 @@ namespace OOP_Lab_1.UI
     {
         private readonly IDatabaseService _databaseService;
 
-        // public RegistrationPage(IDatabaseService databaseService)
-        // {
-        //     InitializeComponent();
-        //     _databaseService = databaseService;
-        // }
-        public RegistrationPage()
+        public RegistrationPage(IDatabaseService databaseService)
         {
             InitializeComponent();
-            _databaseService = DatabaseServiceFactory.CreateDatabaseService();
+            _databaseService = databaseService;
         }
+        // public RegistrationPage()
+        // {
+        //     InitializeComponent();
+        //     _databaseService = DatabaseServiceFactory.CreateDatabaseService();
+        // }
 
         private async void OnRegisterClicked(object sender, EventArgs e)
         {

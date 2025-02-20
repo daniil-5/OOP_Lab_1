@@ -1,14 +1,15 @@
+using OOP_Lab_1.Core.Interfaces;
 using SQLite;
 namespace OOP_Lab_1.Core.Entities;
 
-public class Loan
+public class Loan : ILoan
 {
-    public decimal Amount { get; set; }
+    public double Amount { get; set; }
+    public int DurationMonths { get; set; }
     public double InterestRate { get; set; }
-    public int TermMonths { get; set; }
     public bool Approved { get; private set; }
-    public Client Borrower { get; set; }
-    public Bank IssuingBank { get; set; }
+    public IUser Borrower { get; set; }
+    public IBank IssuingBank { get; set; }
 
     public void Approve()
     {

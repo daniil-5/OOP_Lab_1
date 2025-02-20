@@ -13,16 +13,16 @@ public partial class LoginPage : ContentPage
 {
     private readonly IDatabaseService _databaseService;
 
-    // public LoginPage(IDatabaseService databaseService)
-    // {
-    //     InitializeComponent();
-    //     _databaseService = databaseService;
-    // }
-    public LoginPage()
+    public LoginPage(IDatabaseService databaseService)
     {
         InitializeComponent();
-        _databaseService = DatabaseServiceFactory.CreateDatabaseService();
+        _databaseService = databaseService;
     }
+    // public LoginPage()
+    // {
+    //     InitializeComponent();
+    //     _databaseService = DatabaseServiceFactory.CreateDatabaseService();
+    // }
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {

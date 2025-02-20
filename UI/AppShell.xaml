@@ -10,20 +10,17 @@
     <!-- Login Page -->
     <ShellContent
         Route="LoginPage"
-        ContentTemplate="{DataTemplate ui:LoginPage}"
-        Title="Login" />
-    
+        ContentTemplate="{DataTemplate ui:LoginPage}"/>
+        
     <!-- Registration Page -->
     <ShellContent
         Route="RegistrationPage"
-        ContentTemplate="{DataTemplate ui:RegistrationPage}"
-        Title="Registration" />
+        ContentTemplate="{DataTemplate ui:RegistrationPage}"/>
     
     <!-- Main Page (Dashboard) -->
     <ShellContent
         Route="MainPage"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Title="DashBoard" />
+        ContentTemplate="{DataTemplate local:MainPage}"/>
     
     
 </Shell>
