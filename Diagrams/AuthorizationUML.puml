@@ -1,0 +1,43 @@
+@startuml
+
+class User {
+    - id: String
+    - username: String
+    - password: String
+    - roles: List<Role>
+
+    + login(username: String, password: String): Boolean
+    + hasRole(role: Role): Boolean
+    + getPermissions(): List<Permission>
+}
+
+class Role {
+    - id: String
+    - name: String
+    - permissions: List<Permission>
+
+    + addPermission(permission: Permission)
+    + removePermission(permission: Permission)
+    + hasPermission(permission: Permission): Boolean
+}
+
+class Permission {
+    - id: String
+    - name: String
+    - description: String
+}
+
+class AuthorizationService {
+    + authenticate(user: User, password: String): Boolean
+    + authorize(user: User, permission: Permission): Boolean
+    + assignRole(user: User, role: Role)
+    + revokeRole(user: User, role: Role)
+}
+
+User "1" -- "*" Role : has
+Role "1" -- "*" Permission : contains
+AuthorizationService --> User : manages
+AuthorizationService --> Role : manages
+AuthorizationService --> Permission : manages
+
+@enduml

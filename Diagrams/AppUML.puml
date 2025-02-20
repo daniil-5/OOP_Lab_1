@@ -1,0 +1,122 @@
+@startuml
+' Основные абстракции
+abstract class Bank {
+    - string Name
+    - string BIC
+    - List<Client> Clients
+    - List<Enterprise> Enterprises
+    - List<Account> Accounts
+    + void RegisterClient(Client client)
+    + void RegisterEnterprise(Enterprise enterprise)
+}
+
+abstract class User {
+    - string FullName
+    - string PassportNumber
+    - string IdentificationNumber
+    - string Phone
+    - string Email
+    - int Role
+    + void Authenticate()
+}
+
+class Client extends User {
+    - List<Account> Accounts
+    - List<Bank> Banks
+    + void OpenAccount()
+    + void CloseAccount()
+    + void ApplyForLoan()
+    + void ApplyForSalaryProject()
+}
+
+class Enterprise {
+    - string Type
+    - string LegalName
+    - string UNP
+    - string BIC
+    - string LegalAddress
+    - Bank Bank
+    - List<EnterpriseAccount> Accounts
+    - List<Client> Employees
+    + void ApplyForSalaryProject()
+}
+
+abstract class Account {
+    - string AccountNumber
+    - decimal Balance
+    - bool IsBlocked
+    - Client Owner
+    - Enterprise EnterpriseOwner
+    + void Deposit(decimal amount)
+    + void Withdraw(decimal amount)
+    + void Transfer(Account target, decimal amount)
+}
+
+class EnterpriseAccount extends Account {
+    - Enterprise EnterpriseOwner
+}
+
+class ClientAccount extends Account {
+    - Client Owner
+}
+
+class Loan {
+    - decimal Amount
+    - double InterestRate
+    - int TermMonths
+    - bool Approved
+    - Client Borrower
+    - Bank IssuingBank
+    + void Approve()
+    + void Reject()
+}
+
+class InstallmentPlan extends Loan {}
+
+class Transaction {
+    - Account FromAccount
+    - Account ToAccount
+    - decimal Amount
+    - DateTime Timestamp
+    + void Execute()
+}
+
+
+class Operator {
+    + void ViewTransactionStatistics()
+    + void RevertTransaction()
+}
+
+class Manager {
+    + void ApproveLoan()
+    + void RevertExternalTransaction()
+}
+
+class ExternalSpecialist{
+    + void SubmitSalaryProjectDocuments()
+    + void RequestFundTransfer()
+}
+
+class Administrator{
+    + void ViewAllLogs()
+    + void RevertAllActions()
+}
+class SalaryProject {
+    - map<Client, Salary> EnterpriseWorkers
+    - List<Client> ConnectedClients
+}
+' Связи
+Bank "1" -- "*" Client : обслуживает
+Bank "1" -- "*" Enterprise : обслуживает
+Bank "1" -- "*" Account : хранит счета
+Client "*" -- "*" Account : владеет
+Enterprise "1" -- "*" Account : владеет
+Enterprise "1" -- "*" Client : нанимает сотрудников
+Client "*" -- "*" Loan : берет кредиты
+Loan "1" -- "1" Bank : выдан банком
+Account "1" -- "*" Transaction : участвует в транзакциях
+User <|-- Operator
+User <|-- Manager
+User <|-- ExternalSpecialist
+User <|-- Administrator
+@enduml

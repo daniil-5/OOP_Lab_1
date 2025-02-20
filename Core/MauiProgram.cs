@@ -1,4 +1,8 @@
-﻿namespace OOP_Lab_1;
+﻿using OOP_Lab_1.Core.Interfaces;
+using OOP_Lab_1.Core.Services;
+using OOP_Lab_1.Services;
+
+namespace OOP_Lab_1;
 
 public static class MauiProgram
 {
@@ -12,7 +16,6 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
-
         return builder.Build();
     }
 }
