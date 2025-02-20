@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="OOP_Lab_1.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:OOP_Lab_1"
+    xmlns:ui="clr-namespace:OOP_Lab_1.UI"
+    Shell.FlyoutBehavior="Disabled">
+    
+    <!-- Login Page -->
+    <ShellContent
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate ui:LoginPage}"
+        Title="Login" />
+    
+    <!-- Registration Page -->
+    <ShellContent
+        Route="RegistrationPage"
+        ContentTemplate="{DataTemplate ui:RegistrationPage}"
+        Title="Registration" />
+    
+    <!-- Main Page (Dashboard) -->
+    <ShellContent
+        Route="MainPage"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Title="DashBoard" />
+    
+    
+</Shell>

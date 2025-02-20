@@ -1,0 +1,88 @@
+@startuml
+title Clean Architecture for Banking App
+
+package "Presentation (UI)" {
+    class MauiApp {
+        + Display UI
+        + Handle User Input
+        + Call Application Services
+    }
+    class ViewModel {
+        + Handle UI Logic
+        + Call UseCases
+    }
+    MauiApp --> ViewModel
+}
+
+package "Application (Use Cases)" {
+    class BankService {
+        + RegisterClient()
+        + ProcessTransaction()
+        + ApproveLoan()
+    }
+    class TransactionService {
+        + ExecuteTransaction()
+        + RevertTransaction()
+    }
+    class LoanService {
+        + ApplyForLoan()
+        + ApproveLoan()
+    }
+    ViewModel --> BankService
+    ViewModel --> TransactionService
+    ViewModel --> LoanService
+}
+
+package "Domain (Entities & Business Rules)" {
+    class Bank {
+        - Name
+        - BIC
+        + RegisterClient()
+    }
+    class Client {
+        - FullName
+        - Email
+        - Accounts
+        + OpenAccount()
+        + CloseAccount()
+    }
+    class Account {
+        - AccountNumber
+        - Balance
+        + Deposit()
+        + Withdraw()
+        + Transfer()
+    }
+    class Loan {
+        - Amount
+        - InterestRate
+        - TermMonths
+        + Approve()
+        + Reject()
+    }
+    BankService --> Bank
+    TransactionService --> Account
+    LoanService --> Loan
+    Client --> Account
+}
+
+package "Infrastructure (Persistence & External Services)" {
+    class SQLiteDatabase {
+        + SaveData()
+        + RetrieveData()
+    }
+    class BankRepository {
+        + GetBankById()
+        + SaveBank()
+    }
+    class ClientRepository {
+        + GetClientById()
+        + SaveClient()
+    }
+    SQLiteDatabase --> BankRepository
+    SQLiteDatabase --> ClientRepository
+    BankRepository --> Bank
+    ClientRepository --> Client
+}
+
+@enduml
