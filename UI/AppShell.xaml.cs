@@ -10,10 +10,11 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("registration", typeof(RegistrationPage));
         Routing.RegisterRoute("main", typeof(MainPage));
         Routing.RegisterRoute("login", typeof(LoginPage));
+        Routing.RegisterRoute("banks", typeof(BanksPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()
     {
-        await Shell.Current.GoToAsync("login");
+        await Shell.Current.GoToAsync("///login");
     }
 }

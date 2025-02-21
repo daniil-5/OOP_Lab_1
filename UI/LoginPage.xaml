@@ -6,8 +6,12 @@
              Title="Login">
     <ContentPage.Content>
         <ScrollView>
+            
             <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-
+                <Label x:Name="BankLabel" 
+                       FontSize="40" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" />
                 <!-- Email -->
                 <Label Text="Email" FontAttributes="Bold" />
                 <Entry x:Name="EmailEntry" Placeholder="Enter your email" Keyboard="Email" />

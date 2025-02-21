@@ -9,8 +9,10 @@ using OOP_Lab_1.Core.Services;
 
 namespace OOP_Lab_1.UI;
 
-public partial class LoginPage : ContentPage
+public partial class LoginPage : ContentPage, IQueryAttributable
 {
+    private string SelectedBank { get; set; } = "Unknown";
+    private string BankId { get; set; } = "Unknown";
     private readonly IDatabaseService _databaseService;
 
     public LoginPage(IDatabaseService databaseService)
@@ -18,12 +20,18 @@ public partial class LoginPage : ContentPage
         InitializeComponent();
         _databaseService = databaseService;
     }
-    // public LoginPage()
-    // {
-    //     InitializeComponent();
-    //     _databaseService = DatabaseServiceFactory.CreateDatabaseService();
-    // }
-
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.ContainsKey("BankName"))
+        {
+            SelectedBank = query["BankName"] as string;
+            BankLabel.Text = SelectedBank;
+        }
+        if (query.ContainsKey("BankId"))
+        {
+            BankId = query["BankId"] as string;
+        }
+    }
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         string email = EmailEntry.Text?.Trim() ?? string.Empty;
@@ -39,7 +47,7 @@ public partial class LoginPage : ContentPage
         if (user != null)
         {
             await DisplayAlert("Success", $"Welcome, {user.FullName}!", "OK");
-            await Shell.Current.GoToAsync("//MainPage");
+            await Shell.Current.GoToAsync("main");
         }
         else
         {
@@ -49,12 +57,19 @@ public partial class LoginPage : ContentPage
 
     private async Task<User?> AuthenticateUserAsync(string email, string password)
     {
-        var users = await _databaseService.GetAllUsersAsync();
-        return users.FirstOrDefault(u => u.Email == email && u.Password == password);
+        var users = await _databaseService.GetUserByEmail(email, BankId);
+        if (users == null)
+            return null;
+        else
+            return users;
     }
 
     private async void OnRegisterTapped(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("registration");
+        await Shell.Current.GoToAsync("registration", true, new Dictionary<string, object>
+        {
+            { "BankName", SelectedBank },
+            { "BankId", BankId }
+        });
     }
 }

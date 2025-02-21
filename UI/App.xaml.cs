@@ -8,8 +8,6 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        var databaseService = DatabaseServiceFactory.CreateDatabaseService();
-        //MainPage = new LoginPage(databaseService);
         MainPage = new AppShell();
     }
 }

@@ -1,12 +1,21 @@
+using OOP_Lab_1.Core.Entities;
+
 namespace OOP_Lab_1.Core.Interfaces;
 
 public interface IAccount
 {
-    string AccountNumber { get; }
-    double Balance { get; }
+    Bank Bank { get;}
+    public string AccountNumber { get;}
+    public double Balance { get; }
+    bool IsBlocked { get;}
+    bool IsFrozen { get;}
     void Deposit(double amount);
-    void Withdraw(double amount);
-    void Transfer(IAccount target, double amount);
+    bool Withdraw(double amount);
+    bool Transfer(double amount, IAccount target);
+    
+    void Block();
+    void Unblock();
     void Freeze();
     void Unfreeze();
+    
 }

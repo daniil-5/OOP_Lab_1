@@ -7,6 +7,11 @@
     xmlns:ui="clr-namespace:OOP_Lab_1.UI"
     Shell.FlyoutBehavior="Disabled">
     
+    <!-- Banks Page -->
+    <ShellContent
+        Route="BanksPage"
+        ContentTemplate="{DataTemplate ui:BanksPage}"/>
+    
     <!-- Login Page -->
     <ShellContent
         Route="LoginPage"
