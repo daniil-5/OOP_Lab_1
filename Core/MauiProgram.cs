@@ -23,6 +23,14 @@ public static class MauiProgram
         });
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegistrationPage>();
+        
+        builder.Services.AddSingleton<IBanksService>(sp =>
+        {
+            string databasePath = Path.Combine("/Users/daniil_mariyn/RiderProjects/OOP_Lab_1/DataBase/appDB");
+            return new BanksService(databasePath);
+        });
+        builder.Services.AddTransient<BanksPage>();
+        
         return builder.Build();
     }
 }

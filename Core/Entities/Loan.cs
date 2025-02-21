@@ -8,7 +8,7 @@ public class Loan : ILoan
     public int DurationMonths { get; set; }
     public double InterestRate { get; set; }
     public bool Approved { get; private set; }
-    public IUser Borrower { get; set; }
+    public User Borrower { get; set; }
     public IBank IssuingBank { get; set; }
 
     public void Approve()

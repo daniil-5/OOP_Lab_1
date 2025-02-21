@@ -12,19 +12,31 @@ namespace OOP_Lab_1.Core.Interfaces
         /// </summary>
         /// <param name="user">The user to add.</param>
         /// <returns>True if the user was added successfully; otherwise, false.</returns>
-        Task<bool> AddUserAsync(User user);
+        Task<bool> AddUserAsync(User user, string BankId);
 
         /// <summary>
         /// Checks if a user with the specified email already exists in the database using a raw SQL query.
         /// </summary>
         /// <param name="email">The email to check.</param>
         /// <returns>True if the user exists; otherwise, false.</returns>
-        Task<bool> UserExistsByEmailAsync(string email);
+        Task<bool> UserExistsByEmailAsync(string email, string BankId);
 
         /// <summary>
         /// Retrieves all users from the database using a raw SQL query.
         /// </summary>
         /// <returns>A list of users.</returns>
-        Task<List<User>> GetAllUsersAsync();
+        Task<List<User>> GetAllUsersAsync(string BankId);
+
+        /// <summary>
+        /// Returns a user with the specified email using a raw SQL query.
+        /// </summary>
+        Task<User> GetUserByEmail(string email, string BankId);
+
+        /// <summary>
+        /// Updates the user in the database using a raw SQL query.
+        /// </summary>
+        Task<bool> UpdateUserAsync(User user, string BankId);
+        
+
     }
 }

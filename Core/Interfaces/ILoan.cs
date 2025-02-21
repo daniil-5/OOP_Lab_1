@@ -1,3 +1,4 @@
+using OOP_Lab_1.Core.Entities;
 namespace OOP_Lab_1.Core.Interfaces;
 
 public interface ILoan
@@ -8,6 +9,6 @@ public interface ILoan
     bool Approved { get; }
     void Approve();
     void Reject();
-    IUser Borrower { get; set; }
+    User Borrower { get; set; }
     IBank IssuingBank { get; set; }
 }

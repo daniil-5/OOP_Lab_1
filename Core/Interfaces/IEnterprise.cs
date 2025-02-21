@@ -1,13 +1,15 @@
+using OOP_Lab_1.Core.Entities;
+
 namespace OOP_Lab_1.Core.Interfaces;
 
 public interface IEnterprise
 {
     string LegalName { get; set; }
-    string TaxNumber { get; set; }
-    string BankBIC { get; set; }
+    string UNP { get; set; }
+    string BIC { get; set; }
     string LegalAddress { get; set; }
-    IBank Bank { get; set; }
-
-    void SubmitPayrollProjectRequest();
-    void RequestIntercompanyTransfer(decimal amount, IEnterprise targetEnterprise);
+    Bank Bank { get; set; }
+    List<EnterpriseAccount> Accounts { get; }
+    void ApplyForSalaryProject(Bank bank);
+    void RequestIntercompanyTransfer(decimal amount, Enterprise targetEnterprise);
 }

@@ -1,28 +1,31 @@
+using OOP_Lab_1.Core.Interfaces;
 using SQLite;
 namespace OOP_Lab_1.Core.Entities;
 
-public class Client : User
+public class Client : User, IClientActions
 {
-    public List<Account> Accounts { get; private set; } = new List<Account>();
-    public List<Bank> Banks { get; private set; } = new List<Bank>();
-
-    public void OpenAccount(Account account)
+    public void Register()
     {
-        Accounts.Add(account);
+        Console.WriteLine($"{FullName} (Client) registered.");
     }
 
-    public void CloseAccount(Account account)
+    public void OpenAccount()
     {
-        Accounts.Remove(account);
+        Console.WriteLine($"{FullName} (Client) opened a new account.");
     }
 
-    public void ApplyForLoan(Loan loan)
+    public void CloseAccount()
     {
-        Console.WriteLine($"{FullName} applied for a loan of {loan.Amount}.");
+        Console.WriteLine($"{FullName} (Client) closed an account.");
     }
 
+    public void ApplyForLoan()
+    {
+        Console.WriteLine($"{FullName} (Client) applied for a loan.");
+    }
+    
     public void ApplyForSalaryProject()
     {
-        Console.WriteLine($"{FullName} applied for a salary project.");
+        Console.WriteLine($"{FullName} (Client) applied for salary project.");
     }
 }
