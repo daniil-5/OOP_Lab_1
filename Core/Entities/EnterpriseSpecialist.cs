@@ -9,7 +9,7 @@ public class EnterpriseSpecialist : User, IEnterpriseSpecialistActions
         Role = 3; // Enterprise Specialist
     }
 
-    public void SubmitSalaryProject()
+    public void SubmitDocsForSalaryProject()
     {
         Console.WriteLine($"{FullName} (Enterprise Specialist) submitted a salary project.");
     }

@@ -4,6 +4,10 @@ namespace OOP_Lab_1.Core.Entities;
 
 public class Client : User, IClientActions
 {
+    public Client(User user) : base(user)
+    {
+        this.Role = 0; // Client
+    }
     public void Register()
     {
         Console.WriteLine($"{FullName} (Client) registered.");

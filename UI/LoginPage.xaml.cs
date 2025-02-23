@@ -47,7 +47,12 @@ public partial class LoginPage : ContentPage, IQueryAttributable
         if (user != null)
         {
             await DisplayAlert("Success", $"Welcome, {user.FullName}!", "OK");
-            await Shell.Current.GoToAsync("main");
+            await Shell.Current.GoToAsync("main", true, new Dictionary<string, object>
+            {
+                { "BankName", SelectedBank },
+                { "BankId", BankId },
+                {"CurrentUser", user}
+            });
         }
         else
         {
