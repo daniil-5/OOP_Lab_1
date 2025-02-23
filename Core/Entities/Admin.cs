@@ -8,18 +8,14 @@ public class Admin : User, IAdminActions
     {
         this.Role = 4; // Admin
     }
-    public List<string> ViewLogs()
+    public void ViewLogs()
     {
         Console.WriteLine($"{FullName} (Admin) is viewing logs.");
-        return new List<string>();
     }
-
-    public void CancelAllTransactions()
+    
+    public void CancelUserActions()
     {
-        Console.WriteLine($"{FullName} (Admin) canceled all transactions.");
-    }
-    public void CancelUserAction(string actionId)
-    {
-        Console.WriteLine($"{FullName} (Admin) canceled user action with id {actionId}.");
+        // string actionId
+        Console.WriteLine($"{FullName} (Admin) canceled user action with id.");
     }
 }

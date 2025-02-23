@@ -9,14 +9,14 @@ public class Operator : User, IOperatorActions
         this.Role = 1; //Operator
     }
 
-    public List<string> ViewTransactions()
+    public void ViewTransactions()
     {
+        // List<string>
         Console.WriteLine($"{FullName} (Operator) is viewing transactions.");
-        return new List<string>();
     }
 
-    public void CancelTransaction(string transactionId)
+    public void ConfirmSalaryProject()
     {
-        Console.WriteLine($"{FullName} (Operator) canceled transaction {transactionId}.");
+        Console.WriteLine($"{FullName} (Operator) confirmed salary project.");
     }
 }

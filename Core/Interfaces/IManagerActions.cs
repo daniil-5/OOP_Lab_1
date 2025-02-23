@@ -1,7 +1,7 @@
 namespace OOP_Lab_1.Core.Interfaces;
 
-public interface IManagerActions : IOperatorActions
+public interface IManagerActions
 {
-    void ApproveLoan(string loanId);
-    void CancelExternalTransaction(string transactionId);
+    void ApproveLoan();
+    void CancelExternalTransaction();
 }

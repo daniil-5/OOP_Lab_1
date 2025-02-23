@@ -2,20 +2,32 @@ using OOP_Lab_1.Core.Interfaces;
 
 namespace OOP_Lab_1.Core.Entities;
 
-public class Manager : Operator, IManagerActions
+public class Manager : User, IOperatorActions, IManagerActions
 {
     public Manager(User user) : base(user)
     {
         Role = 2; // Manager
     }
 
-    public void ApproveLoan(string loanId)
+    public void ApproveLoan()
     {
-        Console.WriteLine($"{FullName} (Manager) approved loan {loanId}.");
+        //string loan_id
+        Console.WriteLine($"{FullName} (Manager) approved loan.");
     }
 
-    public void CancelExternalTransaction(string transactionId)
+    public void CancelExternalTransaction()
     {
-        Console.WriteLine($"{FullName} (Manager) canceled external transaction {transactionId}.");
+        // string transactionId
+        Console.WriteLine($"{FullName} (Manager) canceled external transaction .");
+    }
+    public void ViewTransactions()
+    {
+        // List<string>
+        Console.WriteLine($"{FullName} (Manager) is viewing transactions.");
+    }
+
+    public void ConfirmSalaryProject()
+    {
+        Console.WriteLine($"{FullName} (Manager) confirmed salary project.");
     }
 }
