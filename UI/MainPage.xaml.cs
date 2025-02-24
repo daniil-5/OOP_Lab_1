@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using OOP_Lab_1.Core.Entities;
 using OOP_Lab_1.Core.Interfaces;
+using OOP_Lab_1.UI;
 
 namespace OOP_Lab_1;
 
@@ -10,12 +11,12 @@ public partial class MainPage : ContentPage, IQueryAttributable
     private string BankId { get; set; } = "Unknown";
     
     private User CurrentUser;
+    
     private User RoledUser;
     
     public MainPage()
     {
         InitializeComponent();
-        
     }
 
     private void CreateTypeUser(int role)
@@ -58,6 +59,7 @@ public partial class MainPage : ContentPage, IQueryAttributable
         }
         
         CreateTypeUser(CurrentUser.Role);
+        StackLayout.Clear();
         CreateRoleButtons();
     }
     
@@ -65,39 +67,35 @@ public partial class MainPage : ContentPage, IQueryAttributable
     {
         if (RoledUser is IClientActions clientActions)
         {
-            CreateButton("Register", clientActions.Register);
-            CreateButton("Open new Account", clientActions.OpenAccount);
-            CreateButton("Close account", clientActions.CloseAccount);
-            CreateButton("Apply for Loan", clientActions.ApplyForLoan);
-            CreateButton("Apply for Salary Project", clientActions.ApplyForSalaryProject);
+            CreateNavigationButton("Open new Account", "openAccount", clientActions);
+            CreateNavigationButton("Close account", "closeAccount", clientActions);
+            // CreateNavigationButton("Apply for Loan", nameof(ApplyLoanPage), client);
+            // CreateNavigationButton("Apply for Salary Project", nameof(ApplySalaryProjectPage), client);
         }
-        
-        // Check for IManagerActions methods if the current role is Manager
-        if (RoledUser is IManagerActions managerActions)
-        {
-            CreateButton("Approve Loan", managerActions.ApproveLoan);
-            CreateButton("Cancel External Transactions", managerActions.CancelExternalTransaction);
-        }
-        // Check for IOperatorActions methods if the current role is Operator
-        if (RoledUser is IOperatorActions operatorActions)
-        {
-            CreateButton("View Transaction Statistics", operatorActions.ViewTransactions);
-            CreateButton("Confirm Salary Project", operatorActions.ConfirmSalaryProject);
-        }
-        
-        // Check for IEnterpriseSpecialistActions methods if the current role is Enterprise Specialist
-        if (RoledUser is IEnterpriseSpecialistActions enterpriseSpecialistActions)
-        {
-            CreateButton("Submit Salary Project Documents to Operator", enterpriseSpecialistActions.SubmitDocsForSalaryProject);
-            CreateButton("Request Transfer to External Enterprise or Worker", enterpriseSpecialistActions.RequestFundTransfer);
-        }
-        
-        // Check for IAdminActions methods if the current role is Admin
-        if (RoledUser is IAdminActions adminActions)
-        {
-            CreateButton("View Logs", adminActions.ViewLogs);
-            CreateButton("Cancel User Actions", adminActions.CancelUserActions);
-        }
+        //
+        // if (RoledUser is IManagerActions managerActions)
+        // {
+        //     CreateNavigationButton("Approve Loan", nameof(ApproveLoanPage), managerActions);
+        //     CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage), managerActions);
+        // }
+        //
+        // if (RoledUser is IOperatorActions operatorActions)
+        // {
+        //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage), operatorActions);
+        //     CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage), operatorActions);
+        // }
+        //
+        // if (RoledUser is IEnterpriseSpecialistActions enterpriseSpecialistActions)
+        // {
+        //     CreateNavigationButton("Submit Salary Project Documents", nameof(SubmitDocsForSalaryProjectPage), enterpriseSpecialistActions);
+        //     CreateNavigationButton("Request Transfer", nameof(RequestFundTransferPage), enterpriseSpecialistActions);
+        // }
+        //
+        // if (RoledUser is IAdminActions adminActions)
+        // {
+        //     CreateNavigationButton("View Logs", nameof(ViewLogsPage), adminActions);
+        //     CreateNavigationButton("Cancel User Actions", nameof(CancelUserActionsPage), adminActions);
+        // }
 
         // Logout Button
         Button logoutButton = new Button
@@ -108,15 +106,23 @@ public partial class MainPage : ContentPage, IQueryAttributable
         logoutButton.Clicked += OnLogoutClicked;
         StackLayout.Children.Add(logoutButton);
     }
-    private void CreateButton(string label, Action action)
+    private void CreateNavigationButton<T>(string label, string targetPage, T roleObject)
     {
         var button = new Button { Text = label };
-        button.Clicked += (sender, args) => action();
+        button.Clicked += async (sender, args) =>
+        {
+            await Shell.Current.GoToAsync(targetPage, true, new Dictionary<string, object>
+            {
+                { "BankName", SelectedBank },
+                { "BankId", BankId },
+                { "RoleData", roleObject }, // Sending only the relevant interface object
+                {"CurrentUser", CurrentUser}
+            });
+        };
         StackLayout.Children.Add(button);
     }
     private async void OnLogoutClicked(object sender, EventArgs e)
     {
-        
         await Shell.Current.GoToAsync("banks");
     }
 }

@@ -11,6 +11,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("main", typeof(MainPage));
         Routing.RegisterRoute("login", typeof(LoginPage));
         Routing.RegisterRoute("banks", typeof(BanksPage));
+        Routing.RegisterRoute("openAccount", typeof(OpenAccountPage));
+        Routing.RegisterRoute("closeAccount", typeof(CloseAccountPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()

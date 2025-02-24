@@ -17,6 +17,7 @@ namespace OOP_Lab_1.UI
     {
         private string SelectedBank { get; set; } = "Unknown";
         private string BankId { get; set; } = "Unknown";
+        
         private readonly IDatabaseService _databaseService;
 
         public RegistrationPage(IDatabaseService databaseService)
@@ -93,13 +94,9 @@ namespace OOP_Lab_1.UI
                 bool isAdded = await _databaseService.AddUserAsync(newUser, BankId);
                 if (isAdded)
                 {
-                    await DisplayAlert("Success", $"User {fullName} registered as {selectedRole}.", "OK");
+                    await DisplayAlert("Success", $"User {fullName} registered as {getStringRole(selectedRole)}.", "OK");
                     ClearForm();
-                    await Shell.Current.GoToAsync("registration", true, new Dictionary<string, object>
-                    {
-                        { "BankName", SelectedBank },
-                        { "BankId", BankId }
-                    });
+                    await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
@@ -137,6 +134,33 @@ namespace OOP_Lab_1.UI
             EmailEntry.Text = string.Empty;
             PasswordEntry.Text = string.Empty;
             RolePicker.SelectedIndex = -1;
+        }
+        private string getStringRole(int Role)
+        {
+            string strRole;
+            switch (Role)
+            {
+                case 0:
+                    strRole = "Client";
+                    break;
+                case 1:
+                    strRole = "Operator";
+                    break;
+                case 2:
+                    strRole = "Manager";
+                    break;
+                case 3:
+                    strRole = "External Specialist";
+                    break;
+                case 4:
+                    strRole = "Admin";
+                    break;
+                default:
+                    strRole = "Default";
+                    break;
+            }
+
+            return strRole;
         }
     }
 }

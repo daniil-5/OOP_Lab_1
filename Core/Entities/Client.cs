@@ -6,16 +6,12 @@ public class Client : User, IClientActions
 {
     public Client(User user) : base(user)
     {
-        this.Role = 0; // Client
-    }
-    public void Register()
-    {
-        Console.WriteLine($"{FullName} (Client) registered.");
+        this.Role = 0; // Clien
     }
 
-    public void OpenAccount()
+    void OpenAccountAsync(UserAccount account, string tableName)
     {
-        Console.WriteLine($"{FullName} (Client) opened a new account.");
+        Console.WriteLine($"{FullName} (Client) opened an account.");
     }
 
     public void CloseAccount()
@@ -32,4 +28,5 @@ public class Client : User, IClientActions
     {
         Console.WriteLine($"{FullName} (Client) applied for salary project.");
     }
+    
 }

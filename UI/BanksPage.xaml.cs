@@ -26,6 +26,8 @@ public partial class BanksPage : ContentPage
             foreach (var bank in banks)
             {
                 await banksService.CreateBankTableAsync(bank.BankId);
+                string tableName = bank.BankId + "_UserAccounts";
+                await _banksService.CreateAccountTableAsync(tableName);
                 var bankButton = new Button
                 {
                     Text = bank.BankName,
