@@ -28,4 +28,6 @@ public interface IBanksService
     /// Updates the bank in the database using a raw SQL query.
     /// </summary>
     Task<bool> UpdateBankAsync(Bank bank);
+    
+    Task CreateAccountTableAsync(string tableName);
 }

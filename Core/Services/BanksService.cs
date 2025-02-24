@@ -79,7 +79,6 @@ public class BanksService : IBanksService
         }
     }
 
-
     public async Task<bool> AddBankAsync(Bank bank)
     {
         using (var connection = new SqliteConnection(_connectionString))
@@ -145,6 +144,28 @@ public class BanksService : IBanksService
         {
             Console.WriteLine($"Error updating bank: {ex.Message}");
             return false;
+        }
+    }
+    public async Task CreateAccountTableAsync(string tableName)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = $@"
+                CREATE TABLE IF NOT EXISTS {tableName} (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    AccountNumber TEXT NOT NULL UNIQUE,
+                    Balance REAL NOT NULL,
+                    IsBlocked BOOLEAN DEFAULT 0,
+                    IsFrozen BOOLEAN DEFAULT 0,
+                    UserEmail TEXT NOT NULL
+                );";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                await command.ExecuteNonQueryAsync();
+            }
         }
     }
     private string SanitizeTableName(string bankName)

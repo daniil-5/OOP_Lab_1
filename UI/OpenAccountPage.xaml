@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OOP_Lab_1.UI.OpenAccountPage"
+             Title="Open Bank Account">
+    <ContentPage.Content>
+        <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+        
+            <Label Text="Select Account Type:" FontSize="18"/>
+            <Picker x:Name="AccountTypePicker">
+                <Picker.Items>
+                    <x:String>Savings</x:String>
+                    <x:String>Checking</x:String>
+                </Picker.Items>
+            </Picker>
+
+            <Label Text="Initial Deposit:" FontSize="18"/>
+            <Entry x:Name="InitialDepositEntry" Placeholder="Enter amount" Keyboard="Numeric"/>
+
+            <Button Text="Open Account" Clicked="OnOpenAccountClicked"
+                    BackgroundColor="Green" TextColor="White"/>
+
+            <Button Text="Cancel" Clicked="OnCancelClicked"
+                    BackgroundColor="Gray" TextColor="White"/>
+
+        </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

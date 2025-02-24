@@ -4,11 +4,10 @@ namespace OOP_Lab_1.Core.Entities;
 
 public class Account : IAccount
 {
-    public Bank Bank { get; set; }
-    public string AccountNumber { get; private set; }
-    public double Balance { get; private set; }
-    public bool IsBlocked { get; private set; }
-    public bool IsFrozen { get; private set; }
+    public string AccountNumber { get; set; }
+    public double Balance { get; set; }
+    public bool IsBlocked { get; set; }
+    public bool IsFrozen { get; set; }
 
     public void Deposit(double amount)
     {

@@ -27,5 +27,10 @@
         Route="MainPage"
         ContentTemplate="{DataTemplate local:MainPage}"/>
     
+    <!-- OpenAccount Page  -->
+    <ShellContent
+        Route="OpenAccountPage"
+        ContentTemplate="{DataTemplate ui:OpenAccountPage}"/>
+    
     
 </Shell>

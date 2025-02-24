@@ -4,7 +4,6 @@ namespace OOP_Lab_1.Core.Interfaces;
 
 public interface IAccount
 {
-    Bank Bank { get;}
     public string AccountNumber { get;}
     public double Balance { get; }
     bool IsBlocked { get;}
