@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OOP_Lab_1.Core.Entities;
 using OOP_Lab_1.Core.Interfaces;
+using OOP_Lab_1.Core.Generators;
 
 namespace OOP_Lab_1.UI;
 
@@ -57,7 +58,7 @@ public partial class OpenAccountPage : ContentPage, IQueryAttributable
             return;
         }
         
-        UserAccount newAccount = new UserAccount(GenerateAccountNumber(), Double.Parse(initialDepositText), false, false, CurrentUser.Email);
+        UserAccount newAccount = new UserAccount(IdGenerator.GenerateId(16), Double.Parse(initialDepositText), false, false, CurrentUser.Email);
         
         string tableName = BankId + "_UserAccounts";
         
@@ -80,11 +81,6 @@ public partial class OpenAccountPage : ContentPage, IQueryAttributable
     {
         AccountTypePicker.SelectedIndex = -1;
         InitialDepositEntry.Text = string.Empty;
-    }
-    public static string GenerateAccountNumber()
-    {
-        Guid guid = Guid.NewGuid();
-        return guid.ToString("N").Substring(0, 16); // Take first 16 characters of GUID
     }
     
 }

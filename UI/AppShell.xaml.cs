@@ -13,6 +13,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("banks", typeof(BanksPage));
         Routing.RegisterRoute("openAccount", typeof(OpenAccountPage));
         Routing.RegisterRoute("closeAccount", typeof(CloseAccountPage));
+        Routing.RegisterRoute("getLoan", typeof(GetLoanPage));
+        Routing.RegisterRoute("LoanApprovement", typeof(LoanApprovalPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()

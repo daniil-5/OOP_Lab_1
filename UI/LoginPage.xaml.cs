@@ -60,7 +60,7 @@ public partial class LoginPage : ContentPage, IQueryAttributable
         }
     }
 
-    private async Task<User?> AuthenticateUserAsync(string email, string password)
+    private async Task<User> AuthenticateUserAsync(string email, string password)
     {
         var users = await _databaseService.GetUserByEmail(email, BankId);
         if (users == null)

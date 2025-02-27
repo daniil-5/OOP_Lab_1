@@ -11,8 +11,9 @@ public partial class MainPage : ContentPage, IQueryAttributable
     private string BankId { get; set; } = "Unknown";
     
     private User CurrentUser;
-    
     private User RoledUser;
+
+
     
     public MainPage()
     {
@@ -69,16 +70,16 @@ public partial class MainPage : ContentPage, IQueryAttributable
         {
             CreateNavigationButton("Open new Account", "openAccount", clientActions);
             CreateNavigationButton("Close account", "closeAccount", clientActions);
-            // CreateNavigationButton("Apply for Loan", nameof(ApplyLoanPage), client);
-            // CreateNavigationButton("Apply for Salary Project", nameof(ApplySalaryProjectPage), client);
+            CreateNavigationButton("Apply for Loan", "getLoan", clientActions);
+            // CreateNavigationButton("Apply for Salary Project", nameof(ApplySalaryProjectPage), clientActions);
         }
         //
-        // if (RoledUser is IManagerActions managerActions)
-        // {
-        //     CreateNavigationButton("Approve Loan", nameof(ApproveLoanPage), managerActions);
-        //     CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage), managerActions);
-        // }
-        //
+        if (RoledUser is IManagerActions managerActions)
+        {
+            CreateNavigationButton("Approve Loan", "LoanApprovement", managerActions);
+            // CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage), managerActions);
+        }
+        
         // if (RoledUser is IOperatorActions operatorActions)
         // {
         //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage), operatorActions);

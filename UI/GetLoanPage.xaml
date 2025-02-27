@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OOP_Lab_1.UI.GetLoanPage"
+             Title="Apply for a Loan">
+    <ContentPage.Content>
+        <VerticalStackLayout Padding="20" Spacing="10">
+            
+            <Label Text="Type of Loan" FontSize="Medium"/>
+            <Picker x:Name="LoanTypePicker" SelectedIndexChanged="OnLoanTypeChanged">
+                <Picker.Items>
+                    <x:String>Credit</x:String>
+                    <x:String>Installment Plan</x:String>
+                </Picker.Items>
+            </Picker>
+            
+            <Label Text="Loan Duration (Months)" FontSize="Medium"/>
+            <Picker x:Name="LoanDurationPicker">
+                <Picker.Items>
+                    <x:String>3</x:String>
+                    <x:String>6</x:String>
+                    <x:String>12</x:String>
+                    <x:String>24</x:String>
+                    <x:String>36</x:String>
+                </Picker.Items>
+            </Picker>
+            
+            <Label Text="Type of Percentage" FontSize="Medium"/>
+            <Picker x:Name="PercentageTypePicker" SelectedIndexChanged="OnLoanTypeChanged">
+                <Picker.Items>
+                    <x:String>Individual</x:String>
+                    <x:String>Fixed</x:String>
+                </Picker.Items>
+            </Picker>
+            
+            <Label Text="Loan Amount" FontSize="Medium"/>
+            <Entry x:Name="LoanAmountEntry" Keyboard="Numeric" Placeholder="Enter amount" />
+            
+            <Label Text="Current Percent" FontSize="Medium"/>
+            <Label x:Name="CurrentPercent" Text="Select Loan Type and Percentage Type" FontSize="Medium"/>
+            
+            <Label Text="Reason for Loan" FontSize="Medium"/>
+            <Editor x:Name="LoanReasonEditor" HeightRequest="80" Placeholder="Enter loan purpose"/>
+            
+            <Button Text="Submit Loan Application"
+                    Clicked="OnSubmitLoanClicked"/>
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

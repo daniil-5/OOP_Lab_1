@@ -168,11 +168,31 @@ public class BanksService : IBanksService
             }
         }
     }
-    private string SanitizeTableName(string bankName)
+    public async Task CreateLoanTableAsync(string tableName)
     {
-        return bankName.Replace(" ", "_")   // Replace spaces with underscores
-            .Replace("-", "_")   // Replace dashes with underscores
-            .Replace(".", "_")   // Replace dots with underscores
-            .Trim();             // Remove extra spaces
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = $@"
+                CREATE TABLE IF NOT EXISTS {tableName} (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    LoanId TEXT NOT NULL UNIQUE,
+                    TypeOfLoan INTEGER NOT NULL,
+                    TypeOfPercent INTEGER NOT NULL,
+                    Percent REAL NOT NULL,
+                    Amount REAL NOT NULL,
+                    DurationMonths INTEGER NOT NULL,
+                    Purpose TEXT NOT NULL,
+                    Approved BOOLEAN DEFAULT 0,
+                    UserEmail TEXT NOT NULL,
+                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                );";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+        }
     }
 }

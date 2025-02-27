@@ -32,5 +32,10 @@
         Route="OpenAccountPage"
         ContentTemplate="{DataTemplate ui:OpenAccountPage}"/>
     
+    <!-- LoanApproval Page  -->
+    <ShellContent
+        Route="LoanApprovalPage"
+        ContentTemplate="{DataTemplate ui:LoanApprovalPage}"/>
+    
     
 </Shell>

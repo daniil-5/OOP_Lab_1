@@ -48,7 +48,6 @@ namespace OOP_Lab_1.UI
                 string email = EmailEntry.Text?.Trim() ?? string.Empty;
                 string password = PasswordEntry.Text?.Trim() ?? string.Empty;
                 int selectedRole = RolePicker.SelectedIndex;
-                // Validate inputs
                 if (string.IsNullOrEmpty(fullName) || 
                     string.IsNullOrEmpty(passportNumber) || 
                     string.IsNullOrEmpty(identificationNumber) || 
@@ -94,7 +93,7 @@ namespace OOP_Lab_1.UI
                 bool isAdded = await _databaseService.AddUserAsync(newUser, BankId);
                 if (isAdded)
                 {
-                    await DisplayAlert("Success", $"User {fullName} registered as {getStringRole(selectedRole)}.", "OK");
+                    await DisplayAlert("Success", $"User {fullName} registered as {GetStringRole(selectedRole)}.", "OK");
                     ClearForm();
                     await Shell.Current.GoToAsync("..");
                 }
@@ -135,7 +134,7 @@ namespace OOP_Lab_1.UI
             PasswordEntry.Text = string.Empty;
             RolePicker.SelectedIndex = -1;
         }
-        private string getStringRole(int Role)
+        private static string GetStringRole(int Role)
         {
             string strRole;
             switch (Role)

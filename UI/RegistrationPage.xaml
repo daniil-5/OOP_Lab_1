@@ -5,34 +5,25 @@
              Title="Registaration">
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-
-            <!-- Full Name -->
+            
             <Label Text="Full Name" FontAttributes="Bold" />
             <Entry x:Name="FullNameEntry" Placeholder="Enter your full name" />
-
-            <!-- Passport Number -->
+            
             <Label Text="Passport Number" FontAttributes="Bold" />
             <Entry x:Name="PassportNumberEntry" Placeholder="Enter passport number" />
-
-            <!-- Identification Number -->
+            
             <Label Text="Identification Number" FontAttributes="Bold" />
             <Entry x:Name="IdentificationNumberEntry" Placeholder="Enter identification number" />
-
-            <!-- Phone -->
+            
             <Label Text="Phone" FontAttributes="Bold" />
             <Entry x:Name="PhoneEntry" Placeholder="Enter phone number" />
-
-            <!-- Email -->
+            
             <Label Text="Email" FontAttributes="Bold" />
             <Entry x:Name="EmailEntry" Placeholder="Enter email" Keyboard="Email" />
-
-            <!-- Password -->
+            
             <Label Text="Password" FontAttributes="Bold" />
             <Entry x:Name="PasswordEntry" Placeholder="Enter password" IsPassword="True" />
-
-            <!-- Role Selection -->
-            <!-- - -->
-            <!-- Title="Select Role" -->
+            
             <Label Text="Role" FontAttributes="Bold" />
             <Picker x:Name="RolePicker"
                     

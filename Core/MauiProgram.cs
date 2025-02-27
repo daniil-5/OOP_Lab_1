@@ -1,4 +1,5 @@
 ﻿using OOP_Lab_1.Core.Entities;
+using OOP_Lab_1.Core.Entities.Repositories;
 using OOP_Lab_1.Core.Interfaces;
 using OOP_Lab_1.Core.Services;
 using OOP_Lab_1.Services;
@@ -33,7 +34,15 @@ namespace OOP_Lab_1
             builder.Services.AddTransient<OpenAccountPage>();
             builder.Services.AddTransient<CloseAccountPage>();
             
+            
+            builder.Services.AddSingleton<ILoanRepository>(sp => new LoanRepository(_databasePath));
+
+            builder.Services.AddSingleton<ILoanService, LoanService>();
+            builder.Services.AddTransient<GetLoanPage>();
+            builder.Services.AddTransient<LoanApprovalPage>();
+            
             return builder.Build();
         }
     }
+    
 }

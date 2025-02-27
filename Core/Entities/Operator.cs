@@ -6,7 +6,7 @@ public class Operator : User, IOperatorActions
 {
     public Operator(User user) : base(user)
     {
-        this.Role = 1; //Operator
+        this.Role = 1; // Operator
     }
 
     public void ViewTransactions()
