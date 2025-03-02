@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OOP_Lab_1.UI.WithdrawCashPage"
+             Title="Withdraw Cash">
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+                
+                <Label Text="Select Account:" FontAttributes="Bold"/>
+                <Picker x:Name="AccountsPicker"
+                        ItemsSource="{Binding Accounts}"
+                        ItemDisplayBinding="{Binding .}"
+                        SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
+                
+                <Label Text="Enter Amount:" FontAttributes="Bold"/>
+                <Entry Text="{Binding WithdrawAmount, Mode=TwoWay}" 
+                       Keyboard="Numeric"/>
+                
+                <Button Text="Withdraw" 
+                        Command="{Binding WithdrawCommand}"/>
+
+                <Label Text="{Binding StatusMessage}" 
+                       TextColor="Red"
+                       FontSize="Small"
+                       IsVisible="{Binding StatusMessage}"/>
+                
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

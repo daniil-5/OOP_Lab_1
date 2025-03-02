@@ -8,6 +8,8 @@ public class Account : IAccount
     public double Balance { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsFrozen { get; set; }
+    
+    public string BIC { get; set; }
 
     public void Deposit(double amount)
     {

@@ -8,6 +8,7 @@ public interface IAccount
     public double Balance { get; }
     bool IsBlocked { get;}
     bool IsFrozen { get;}
+    string BIC { get; set; }
     void Deposit(double amount);
     bool Withdraw(double amount);
     bool Transfer(double amount, IAccount target);

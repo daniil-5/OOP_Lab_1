@@ -11,7 +11,6 @@ namespace OOP_Lab_1.UI
     {
         private string SelectedBank { get; set; } = "Unknown";
         private string BankId { get; set; } = "Unknown";
-        private IClientActions _clientActions;
         private User CurrentUser;
         private readonly IAccountService _accountService;
 
@@ -31,24 +30,19 @@ namespace OOP_Lab_1.UI
             {
                 BankId = query["BankId"] as string;
             }
-            if (query.ContainsKey("RoleData") && query["RoleData"] is IClientActions clientActions)
-            {
-                _clientActions = clientActions;
-            }
             if (query.ContainsKey("CurrentUser"))
             {
                 CurrentUser = query["CurrentUser"] as User;
             }
             
-            _ = LoadUserAccountsAsync();
+            LoadUserAccountsAsync();
         }
         
         private async Task LoadUserAccountsAsync()
         {
             try
             {
-                string tableName = BankId + "_UserAccounts";
-                var accounts = await _accountService.GetAccountsByEmailAsync(tableName, CurrentUser.Email);
+                var accounts = await _accountService.GetAccountsByEmailAsync(CurrentUser.Email);
 
                 if (accounts != null && accounts.Any())
                 {
@@ -81,11 +75,10 @@ namespace OOP_Lab_1.UI
 
             if (confirm)
             {
-                string tableName = BankId + "_UserAccounts";
                 int startIndex = selectedAccount.IndexOf("Account number:") + "Account number:".Length;
                 int endIndex = selectedAccount.IndexOf(";", startIndex);
                 string accountNumber = selectedAccount.Substring(startIndex, endIndex - startIndex).Trim();
-                bool isClosed = await _accountService.DeleteAccountAsync(tableName, accountNumber);
+                bool isClosed = await _accountService.DeleteAccountAsync(accountNumber);
 
                 if (isClosed)
                 {

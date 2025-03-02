@@ -29,6 +29,6 @@ public interface IBanksService
     /// </summary>
     Task<bool> UpdateBankAsync(Bank bank);
     
-    Task CreateAccountTableAsync(string tableName);
-    Task CreateLoanTableAsync(string tableName);
+    Task CreateAccountTableAsync();
+    Task CreateLoanTableAsync();
 }

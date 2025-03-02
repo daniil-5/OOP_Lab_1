@@ -4,7 +4,7 @@ using OOP_Lab_1.Core.Interfaces;
 using OOP_Lab_1.Core.Services;
 using OOP_Lab_1.Services;
 using OOP_Lab_1.UI;
-
+using OOP_Lab_1.UI.ViewModels;
 
 
 namespace OOP_Lab_1
@@ -30,9 +30,16 @@ namespace OOP_Lab_1
             builder.Services.AddSingleton<IBanksService>(sp => new BanksService(_databasePath));
             builder.Services.AddTransient<BanksPage>();
             
-            builder.Services.AddSingleton<IAccountService>(sp => new AccountService(_databasePath));
+            
+            builder.Services.AddSingleton<IAccountRepository>(sp => new AccountRepository(_databasePath));
+            
+            builder.Services.AddSingleton<IAccountService, AccountService>();
+            builder.Services.AddTransient<WithdrawCashPage>();
             builder.Services.AddTransient<OpenAccountPage>();
             builder.Services.AddTransient<CloseAccountPage>();
+            builder.Services.AddTransient<TransferPage>();
+            
+            
             
             
             builder.Services.AddSingleton<ILoanRepository>(sp => new LoanRepository(_databasePath));

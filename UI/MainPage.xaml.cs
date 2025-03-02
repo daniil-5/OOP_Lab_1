@@ -68,34 +68,36 @@ public partial class MainPage : ContentPage, IQueryAttributable
     {
         if (RoledUser is IClientActions clientActions)
         {
-            CreateNavigationButton("Open new Account", "openAccount", clientActions);
-            CreateNavigationButton("Close account", "closeAccount", clientActions);
-            CreateNavigationButton("Apply for Loan", "getLoan", clientActions);
-            // CreateNavigationButton("Apply for Salary Project", nameof(ApplySalaryProjectPage), clientActions);
+            CreateNavigationButton("Open new Account", "openAccount");
+            CreateNavigationButton("Close account", "closeAccount");
+            CreateNavigationButton("Apply for Loan", "getLoan");
+            // CreateNavigationButton("Apply for Salary Project", "applySalaryProject");
+            CreateNavigationButton("Transfer to account", "transfer");
+            CreateNavigationButton("Withdraw Cash", "withdrawCash");
         }
         //
         if (RoledUser is IManagerActions managerActions)
         {
-            CreateNavigationButton("Approve Loan", "LoanApprovement", managerActions);
-            // CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage), managerActions);
+            CreateNavigationButton("Approve Loan", "LoanApprovement");
+            // CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage));
         }
         
         // if (RoledUser is IOperatorActions operatorActions)
         // {
-        //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage), operatorActions);
-        //     CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage), operatorActions);
+        //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage));
+        //     CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage));
         // }
         //
         // if (RoledUser is IEnterpriseSpecialistActions enterpriseSpecialistActions)
         // {
-        //     CreateNavigationButton("Submit Salary Project Documents", nameof(SubmitDocsForSalaryProjectPage), enterpriseSpecialistActions);
-        //     CreateNavigationButton("Request Transfer", nameof(RequestFundTransferPage), enterpriseSpecialistActions);
+        //     CreateNavigationButton("Submit Salary Project Documents", nameof(SubmitDocsForSalaryProjectPage));
+        //     CreateNavigationButton("Request Transfer", nameof(RequestFundTransferPage));
         // }
         //
         // if (RoledUser is IAdminActions adminActions)
         // {
-        //     CreateNavigationButton("View Logs", nameof(ViewLogsPage), adminActions);
-        //     CreateNavigationButton("Cancel User Actions", nameof(CancelUserActionsPage), adminActions);
+        //     CreateNavigationButton("View Logs", nameof(ViewLogsPage));
+        //     CreateNavigationButton("Cancel User Actions", nameof(CancelUserActionsPage));
         // }
 
         // Logout Button
@@ -107,7 +109,7 @@ public partial class MainPage : ContentPage, IQueryAttributable
         logoutButton.Clicked += OnLogoutClicked;
         StackLayout.Children.Add(logoutButton);
     }
-    private void CreateNavigationButton<T>(string label, string targetPage, T roleObject)
+    private void CreateNavigationButton(string label, string targetPage)
     {
         var button = new Button { Text = label };
         button.Clicked += async (sender, args) =>
@@ -116,7 +118,6 @@ public partial class MainPage : ContentPage, IQueryAttributable
             {
                 { "BankName", SelectedBank },
                 { "BankId", BankId },
-                { "RoleData", roleObject }, // Sending only the relevant interface object
                 {"CurrentUser", CurrentUser}
             });
         };

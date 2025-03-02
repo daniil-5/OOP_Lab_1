@@ -5,13 +5,14 @@ namespace OOP_Lab_1.Core.Entities;
 
 public class UserAccount : Account
 {
-    public UserAccount(string accountNumber, double balance, bool isBlocked, bool isFrozen, string userEmail)
+    public UserAccount(string accountNumber, double balance, bool isBlocked, bool isFrozen, string userEmail, string bic)
     {
         AccountNumber = accountNumber;
         Balance = balance;
         IsBlocked = isBlocked;
         IsFrozen = isFrozen;
         UserEmail = userEmail;
+        BIC = bic;
     }
 
     public override string ToString()

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OOP_Lab_1.UI.TransferPage"
+             Title="Transfer Money">
+
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+
+                <!-- Source Account Picker -->
+                <Label Text="From Account:" FontAttributes="Bold"/>
+                <Picker x:Name="FromAccountPicker"
+                        ItemsSource="{Binding Accounts}"
+                        ItemDisplayBinding="{Binding AccountNumber}"
+                        SelectedItem="{Binding SelectedFromAccount, Mode=TwoWay}"/>
+
+                <!-- Destination Account Picker -->
+                <Label Text="To Account:" FontAttributes="Bold"/>
+                <Picker x:Name="ToAccountPicker"
+                        ItemsSource="{Binding Accounts}"
+                        ItemDisplayBinding="{Binding AccountNumber}"
+                        SelectedItem="{Binding SelectedToAccount, Mode=TwoWay}"/>
+
+                <!-- Amount Entry -->
+                <Label Text="Amount:" FontAttributes="Bold"/>
+                <Entry Text="{Binding TransferAmount, Mode=TwoWay}" 
+                       Keyboard="Numeric"
+                       Placeholder="Enter amount"/>
+
+                <!-- Transfer Button -->
+                <Button Text="Transfer" 
+                        Command="{Binding TransferCommand}"
+                        BackgroundColor="Green"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"/>
+
+                <!-- Status Message -->
+                <Label Text="{Binding StatusMessage}" 
+                       TextColor="{Binding StatusColor}"
+                       FontSize="Small"
+                       HorizontalOptions="Center"
+                       IsVisible="{Binding StatusMessage}"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

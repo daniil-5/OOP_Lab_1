@@ -37,5 +37,10 @@
         Route="LoanApprovalPage"
         ContentTemplate="{DataTemplate ui:LoanApprovalPage}"/>
     
+    <!-- Withdraw Page  -->
+    <ShellContent
+        Route="WithdrawCashPage"
+        ContentTemplate="{DataTemplate ui:WithdrawCashPage}"/>
+    
     
 </Shell>

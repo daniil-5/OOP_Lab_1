@@ -13,7 +13,6 @@ public partial class OpenAccountPage : ContentPage, IQueryAttributable
 {
     private string SelectedBank { get; set; } = "Unknown";
     private string BankId { get; set; } = "Unknown";
-    private IClientActions _clientActions;
     private User CurrentUser;
     private readonly IAccountService _accountService;
     public OpenAccountPage(IAccountService accountService)
@@ -31,10 +30,6 @@ public partial class OpenAccountPage : ContentPage, IQueryAttributable
         if (query.ContainsKey("BankId"))
         {
             BankId = query["BankId"] as string;
-        }
-        if (query.ContainsKey("RoleData") && query["RoleData"] is IClientActions clientActions)
-        {
-            _clientActions = clientActions;
         }
         if (query.ContainsKey("CurrentUser"))
         {
@@ -58,11 +53,11 @@ public partial class OpenAccountPage : ContentPage, IQueryAttributable
             return;
         }
         
-        UserAccount newAccount = new UserAccount(IdGenerator.GenerateId(16), Double.Parse(initialDepositText), false, false, CurrentUser.Email);
+        UserAccount newAccount = new UserAccount(IdGenerator.GenerateId(16), Double.Parse(initialDepositText), false, false, CurrentUser.Email, BankId);
         
         string tableName = BankId + "_UserAccounts";
         
-        bool isCreated = await _accountService.AddAccountAsync(tableName, newAccount);
+        bool isCreated = await _accountService.AddAccountAsync(newAccount);
         if (!isCreated)
         {
             await DisplayAlert("Error", "Failed to open account. Please try again.", "OK");

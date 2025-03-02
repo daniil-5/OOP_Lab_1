@@ -146,20 +146,21 @@ public class BanksService : IBanksService
             return false;
         }
     }
-    public async Task CreateAccountTableAsync(string tableName)
+    public async Task CreateAccountTableAsync()
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-            var sql = $@"
-                CREATE TABLE IF NOT EXISTS {tableName} (
+            var sql = @"
+                CREATE TABLE IF NOT EXISTS UserAccounts (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     AccountNumber TEXT NOT NULL UNIQUE,
                     Balance REAL NOT NULL,
                     IsBlocked BOOLEAN DEFAULT 0,
                     IsFrozen BOOLEAN DEFAULT 0,
-                    UserEmail TEXT NOT NULL
+                    UserEmail TEXT NOT NULL,
+                    BIC TEXT NOT NULL                                                         
                 );";
 
             using (var command = new SqliteCommand(sql, connection))
@@ -168,14 +169,14 @@ public class BanksService : IBanksService
             }
         }
     }
-    public async Task CreateLoanTableAsync(string tableName)
+    public async Task CreateLoanTableAsync()
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-            var sql = $@"
-                CREATE TABLE IF NOT EXISTS {tableName} (
+            var sql = @"
+                CREATE TABLE IF NOT EXISTS Loans (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     LoanId TEXT NOT NULL UNIQUE,
                     TypeOfLoan INTEGER NOT NULL,
@@ -186,6 +187,7 @@ public class BanksService : IBanksService
                     Purpose TEXT NOT NULL,
                     Approved BOOLEAN DEFAULT 0,
                     UserEmail TEXT NOT NULL,
+                    BIC TEXT NOT NULL,
                     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 );";
 
