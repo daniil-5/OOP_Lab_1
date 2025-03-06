@@ -109,8 +109,8 @@ public partial class GetLoanPage : ContentPage, IQueryAttributable
             UserEmail = CurrentUser.Email,
             Approved = false
         };
-        string tableName = BankId.ToString() + "_Loans";
-        bool success = await _loanService.AddLoanAsync(tableName, newLoan);
+        Console.WriteLine("Saving loan");
+        bool success = await _loanService.AddLoanAsync(newLoan, BankId);
         if (success)
         {
             await DisplayAlert("Success", "Loan application submitted successfully!", "OK");

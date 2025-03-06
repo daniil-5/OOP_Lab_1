@@ -7,11 +7,10 @@ namespace OOP_Lab_1;
 
 public partial class MainPage : ContentPage, IQueryAttributable
 {
-    private string SelectedBank { get; set; } = "Unknown";
-    private string BankId { get; set; } = "Unknown";
+    private string _selectedBank;
+    private string _bankId;
     
-    private User CurrentUser;
-    private User RoledUser;
+    private User _currentUser;
 
 
     
@@ -20,53 +19,29 @@ public partial class MainPage : ContentPage, IQueryAttributable
         InitializeComponent();
     }
 
-    private void CreateTypeUser(int role)
-    {
-        switch(CurrentUser.Role)
-        {
-            case 0:
-                RoledUser = new Client(CurrentUser);
-                break;
-            case 1:
-                RoledUser = new Operator(CurrentUser);
-                break;
-            case 2:
-                RoledUser = new Manager(CurrentUser);
-                break;
-            case 3:
-                RoledUser = new EnterpriseSpecialist(CurrentUser);
-                break;
-            case 4:
-                RoledUser = new Admin(CurrentUser);
-                break;
-            default:
-                throw new InvalidOperationException("Unknown role");
-        }
-    }
     
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.ContainsKey("BankName"))
         {
-            SelectedBank = query["BankName"] as string;
+            _selectedBank = query["BankName"] as string;
         }
         if (query.ContainsKey("BankId"))
         {
-            BankId = query["BankId"] as string;
+            _bankId = query["BankId"] as string;
         }
         if (query.ContainsKey("CurrentUser"))
         {
-            CurrentUser = query["CurrentUser"] as User;
+            _currentUser = query["CurrentUser"] as User;
         }
         
-        CreateTypeUser(CurrentUser.Role);
         StackLayout.Clear();
         CreateRoleButtons();
     }
     
     private async void CreateRoleButtons()
     {
-        if (RoledUser is IClientActions clientActions)
+        if (_currentUser.Role == 0)
         {
             CreateNavigationButton("Open new Account", "openAccount");
             CreateNavigationButton("Close account", "closeAccount");
@@ -74,27 +49,29 @@ public partial class MainPage : ContentPage, IQueryAttributable
             // CreateNavigationButton("Apply for Salary Project", "applySalaryProject");
             CreateNavigationButton("Transfer to account", "transfer");
             CreateNavigationButton("Withdraw Cash", "withdrawCash");
+            CreateNavigationButton("Refill Balance", "refillBalance");
         }
-        //
-        if (RoledUser is IManagerActions managerActions)
+        
+        if (_currentUser.Role == 2)
         {
             CreateNavigationButton("Approve Loan", "LoanApprovement");
+            CreateNavigationButton("Approve Registaration", "UserApprovement");
             // CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage));
         }
         
-        // if (RoledUser is IOperatorActions operatorActions)
+        // if (_currentUser.Role == 1)
         // {
         //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage));
         //     CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage));
         // }
         //
-        // if (RoledUser is IEnterpriseSpecialistActions enterpriseSpecialistActions)
+        // if (_currentUser.Role == 3)
         // {
         //     CreateNavigationButton("Submit Salary Project Documents", nameof(SubmitDocsForSalaryProjectPage));
         //     CreateNavigationButton("Request Transfer", nameof(RequestFundTransferPage));
         // }
         //
-        // if (RoledUser is IAdminActions adminActions)
+        // if (_currentUser.Role == 4)
         // {
         //     CreateNavigationButton("View Logs", nameof(ViewLogsPage));
         //     CreateNavigationButton("Cancel User Actions", nameof(CancelUserActionsPage));
@@ -116,9 +93,9 @@ public partial class MainPage : ContentPage, IQueryAttributable
         {
             await Shell.Current.GoToAsync(targetPage, true, new Dictionary<string, object>
             {
-                { "BankName", SelectedBank },
-                { "BankId", BankId },
-                {"CurrentUser", CurrentUser}
+                {"BankName", _selectedBank},
+                { "BankId", _bankId },
+                {"CurrentUser", _currentUser}
             });
         };
         StackLayout.Children.Add(button);

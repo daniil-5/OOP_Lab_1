@@ -9,7 +9,7 @@ namespace OOP_Lab_1.UI.Models
     public class LoanApprovalViewModel : BaseViewModel
     {
         private readonly ILoanService _loanService;
-        private string _tableName;
+        private string _bic;
 
         public ObservableCollection<Loan> Loans { get; set; }
         
@@ -24,18 +24,17 @@ namespace OOP_Lab_1.UI.Models
             ApproveCommand = new Command<Loan>(async (loan) => await ApproveLoan(loan));
             RejectCommand = new Command<Loan>(async (loan) => await RejectLoan(loan));
         }
-
-        // Apply query to get the Bank ID
-        public void ApplyBankId(string bankId)
+        
+        public void ApplyBic(string bic)
         {
-            _tableName = $"{bankId}_Loans";
+            _bic = bic;
             LoadLoans();
         }
 
         // Load Pending Loans from the Service
         private async void LoadLoans()
         {
-            var pendingLoans = await _loanService.GetPendingLoansAsync(_tableName);
+            var pendingLoans = await _loanService.GetPendingLoansAsync(_bic);
             Loans.Clear();
             foreach (var loan in pendingLoans)
             {
@@ -46,17 +45,16 @@ namespace OOP_Lab_1.UI.Models
         // Approve Loan
         private async Task ApproveLoan(Loan loan)
         {
-            Console.WriteLine(_tableName);
-            await _loanService.UpdateLoanApprovalStatusAsync(_tableName, loan.LoanId, true);
+            await _loanService.UpdateLoanApprovalStatusAsync(loan.LoanId, true);
+            await _loanService.UpdateLoanTimestampAsync(loan.LoanId);
             Loans.Remove(loan); // Remove from the list after approval
         }
 
         // Reject Loan
         private async Task RejectLoan(Loan loan)
         {
-            Console.WriteLine("Rejecting loan...");
-            // await _loanService.UpdateLoanApprovalStatusAsync(_tableName, loan.LoanId, false);
-            // await _loanService.CancelLoanAsync(_tableName, loan.LoanId);
+            await _loanService.UpdateLoanApprovalStatusAsync(loan.LoanId, false);
+            await _loanService.CancelLoanAsync(loan.LoanId);
             Loans.Remove(loan); // Remove from the list after rejection
         }
     }

@@ -13,19 +13,19 @@ public partial class LoginPage : ContentPage, IQueryAttributable
 {
     private string SelectedBank { get; set; } = "Unknown";
     private string BankId { get; set; } = "Unknown";
-    private readonly IDatabaseService _databaseService;
+    private readonly IUserService _userService;
 
-    public LoginPage(IDatabaseService databaseService)
+    public LoginPage(IUserService userService)
     {
         InitializeComponent();
-        _databaseService = databaseService;
+        _userService = userService;
     }
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.ContainsKey("BankName"))
         {
             SelectedBank = query["BankName"] as string;
-            BankLabel.Text = SelectedBank;
+            if (SelectedBank != null) BankLabel.Text = SelectedBank;
         }
         if (query.ContainsKey("BankId"))
         {
@@ -42,8 +42,8 @@ public partial class LoginPage : ContentPage, IQueryAttributable
             await DisplayAlert("Validation Error", "Please enter both email and password.", "OK");
             return;
         }
-        
-        var user = await AuthenticateUserAsync(email, password);
+        var user = await _userService.LoginAsync(email, password, BankId);
+        Console.WriteLine("User logged in");
         if (user != null)
         {
             await DisplayAlert("Success", $"Welcome, {user.FullName}!", "OK");
@@ -58,15 +58,6 @@ public partial class LoginPage : ContentPage, IQueryAttributable
         {
             await DisplayAlert("Error", "Invalid email or password.", "OK");
         }
-    }
-
-    private async Task<User> AuthenticateUserAsync(string email, string password)
-    {
-        var users = await _databaseService.GetUserByEmail(email, BankId);
-        if (users == null)
-            return null;
-        else
-            return users;
     }
 
     private async void OnRegisterTapped(object sender, EventArgs e)

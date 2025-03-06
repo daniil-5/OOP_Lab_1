@@ -135,7 +135,7 @@ public class AccountRepository :IAccountRepository
             throw;
         }
     } 
-   public async Task<List<UserAccount>> GetAccountsByEmailAsync(string email)
+   public async Task<List<UserAccount>> GetAccountsByEmailAsync(string email, string bankId)
     {
         List<UserAccount> accounts = new List<UserAccount>();
 
@@ -144,11 +144,12 @@ public class AccountRepository :IAccountRepository
             await connection.OpenAsync();
 
             var sql = @"
-            SELECT * FROM UserAccounts WHERE UserEmail = @UserEmail";
+            SELECT * FROM UserAccounts WHERE (UserEmail = @UserEmail and BIC = @BIC)";
 
             using (var command = new SqliteCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@UserEmail", email);
+                command.Parameters.AddWithValue("@BIC", bankId);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -215,7 +216,7 @@ public class AccountRepository :IAccountRepository
         await connection.OpenAsync();
 
         // Check account status and balance
-        var checkSql = @$"
+        var checkSql = @"
             SELECT Balance, IsBlocked, IsFrozen 
             FROM UserAccounts 
             WHERE AccountNumber = @AccountNumber;";
@@ -418,6 +419,85 @@ public async Task<bool> TransferAsync(string fromAccountId, string toAccountId, 
 
                 await transaction.CommitAsync(); // Commit the transaction
                 return true; // Transfer successful
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); // Rollback the transaction in case of an error
+                throw; // Re-throw the exception
+            }
+        }
+    }
+}
+
+public async Task<bool> RefillAsync(string accountId, double amount)
+{
+    // Validate input parameters
+    if (string.IsNullOrEmpty(accountId))
+        throw new ArgumentException("Account ID cannot be null or empty.", nameof(accountId));
+
+    if (amount <= 0)
+        throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+
+    using (var connection = new SqliteConnection(_connectionString))
+    {
+        await connection.OpenAsync();
+
+        // Begin a transaction
+        using (var transaction = (SqliteTransaction)await connection.BeginTransactionAsync())
+        {
+            try
+            {
+                // Check account status
+                var checkSql = @"
+                    SELECT IsBlocked, IsFrozen 
+                    FROM UserAccounts 
+                    WHERE AccountNumber = @AccountNumber;";
+
+                using (var checkCommand = new SqliteCommand(checkSql, connection, transaction))
+                {
+                    checkCommand.Parameters.AddWithValue("@AccountNumber", accountId);
+
+                    using (var reader = await checkCommand.ExecuteReaderAsync())
+                    {
+                        if (!await reader.ReadAsync())
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Account not found
+                        }
+
+                        bool isBlocked = reader.GetBoolean(0);
+                        bool isFrozen = reader.GetBoolean(1);
+
+                        // Check if the account is blocked or frozen
+                        if (isBlocked || isFrozen)
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Refill denied: Account is blocked or frozen
+                        }
+                    }
+                }
+
+                // Add the amount to the account balance
+                var updateSql = @"
+                    UPDATE UserAccounts 
+                    SET Balance = Balance + @Amount 
+                    WHERE AccountNumber = @AccountNumber;";
+
+                using (var updateCommand = new SqliteCommand(updateSql, connection, transaction))
+                {
+                    updateCommand.Parameters.AddWithValue("@Amount", amount);
+                    updateCommand.Parameters.AddWithValue("@AccountNumber", accountId);
+
+                    int rowsAffected = await updateCommand.ExecuteNonQueryAsync();
+                    if (rowsAffected == 0)
+                    {
+                        await transaction.RollbackAsync(); // Rollback the transaction
+                        return false; // Failed to refill account
+                    }
+                }
+
+                await transaction.CommitAsync(); // Commit the transaction
+                return true; // Refill successful
             }
             catch (Exception)
             {

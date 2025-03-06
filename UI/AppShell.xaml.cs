@@ -17,6 +17,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("LoanApprovement", typeof(LoanApprovalPage));
         Routing.RegisterRoute("withdrawCash", typeof(WithdrawCashPage));
         Routing.RegisterRoute("transfer", typeof(TransferPage));
+        Routing.RegisterRoute("refillBalance", typeof(RefilAccountPage));
+        Routing.RegisterRoute("UserApprovement", typeof(RegistrationApprovalPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()

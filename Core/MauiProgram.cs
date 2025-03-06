@@ -2,8 +2,8 @@
 using OOP_Lab_1.Core.Entities.Repositories;
 using OOP_Lab_1.Core.Interfaces;
 using OOP_Lab_1.Core.Services;
-using OOP_Lab_1.Services;
 using OOP_Lab_1.UI;
+using OOP_Lab_1.UI.Models;
 using OOP_Lab_1.UI.ViewModels;
 
 
@@ -23,23 +23,29 @@ namespace OOP_Lab_1
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
-            builder.Services.AddSingleton<IDatabaseService>(sp => new DatabaseService(_databasePath));
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<RegistrationPage>();
         
             builder.Services.AddSingleton<IBanksService>(sp => new BanksService(_databasePath));
             builder.Services.AddTransient<BanksPage>();
+            
+            
+            builder.Services.AddSingleton<IUserRepository>(sp => new UserRepository(_databasePath));
+            
+            builder.Services.AddSingleton<IUserService, UserService>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegistrationViewModel>();
+            builder.Services.AddTransient<RegistrationApprovalPage>();
+            builder.Services.AddTransient<UserApprovalViewModel>();
+            builder.Services.AddTransient<RegistrationPage>();
             
             
             builder.Services.AddSingleton<IAccountRepository>(sp => new AccountRepository(_databasePath));
             
             builder.Services.AddSingleton<IAccountService, AccountService>();
             builder.Services.AddTransient<WithdrawCashPage>();
+            builder.Services.AddTransient<RefilAccountPage>();
             builder.Services.AddTransient<OpenAccountPage>();
             builder.Services.AddTransient<CloseAccountPage>();
             builder.Services.AddTransient<TransferPage>();
-            
-            
             
             
             builder.Services.AddSingleton<ILoanRepository>(sp => new LoanRepository(_databasePath));

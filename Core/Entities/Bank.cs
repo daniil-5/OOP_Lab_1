@@ -6,12 +6,5 @@ public abstract class Bank
 {
     public string Name { get; set; }
     public string BIC { get; set; }
-    public List<Client> Clients { get; private set; } = new List<Client>();
-    public List<IAccount> Accounts { get; private set; } = new List<IAccount>();
-
-    public void RegisterClient(Client client)
-    {
-        Clients.Add(client);
-    }
     
 }

@@ -42,7 +42,7 @@ namespace OOP_Lab_1.UI
         {
             try
             {
-                var accounts = await _accountService.GetAccountsByEmailAsync(CurrentUser.Email);
+                var accounts = await _accountService.GetAccountsByEmailAsync(CurrentUser.Email, BankId);
 
                 if (accounts != null && accounts.Any())
                 {

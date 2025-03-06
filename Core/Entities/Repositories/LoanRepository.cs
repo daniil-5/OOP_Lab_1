@@ -21,17 +21,17 @@ public class LoanRepository : ILoanRepository
         }
     }
     
-    public async Task<bool> AddLoanAsync(string tableName, Loan loan)
+    public async Task<bool> AddLoanAsync(Loan loan, string bic)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
 
             var sql = $@"
-            INSERT INTO {tableName} 
-            (LoanId, TypeOfLoan, TypeOfPercent, Percent, Amount, DurationMonths, Purpose, Approved, UserEmail, Timestamp) 
+            INSERT INTO Loans 
+            (LoanId, TypeOfLoan, TypeOfPercent, Percent, Amount, DurationMonths, Purpose, Approved, UserEmail, BIC, Timestamp) 
             VALUES 
-            (@LoanId, @TypeOfLoan, @TypeOfPercent, @Percent, @Amount, @DurationMonths, @Purpose, @Approved, @UserEmail, CURRENT_TIMESTAMP)";
+            (@LoanId, @TypeOfLoan, @TypeOfPercent, @Percent, @Amount, @DurationMonths, @Purpose, @Approved, @UserEmail, @BIC ,CURRENT_TIMESTAMP)";
 
             using (var command = new SqliteCommand(sql, connection))
             {
@@ -44,19 +44,20 @@ public class LoanRepository : ILoanRepository
                 command.Parameters.AddWithValue("@Purpose", loan.Purpose);
                 command.Parameters.AddWithValue("@Approved", loan.Approved);
                 command.Parameters.AddWithValue("@UserEmail", loan.UserEmail);
+                command.Parameters.AddWithValue("@BIC", bic);
 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
         }
     }
 
-    public async Task<bool> CancelLoanAsync(string tableName, string loanId)
+    public async Task<bool> CancelLoanAsync(string loanId)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-            var sql = $"DELETE FROM {tableName} WHERE LoanId = @LoanId";
+            var sql = $"DELETE FROM Loans WHERE LoanId = @LoanId";
 
             using (var command = new SqliteCommand(sql, connection))
             {
@@ -66,7 +67,7 @@ public class LoanRepository : ILoanRepository
         }
     }
 
-    public async Task<List<Loan>> GetLoansByEmailAsync(string tableName, string userEmail)
+    public async Task<List<Loan>> GetLoansByEmailAsync(string userEmail, string bic)
     {
         var loans = new List<Loan>();
 
@@ -74,11 +75,12 @@ public class LoanRepository : ILoanRepository
         {
             await connection.OpenAsync();
 
-            var sql = $"SELECT * FROM {tableName} WHERE UserEmail = @UserEmail";
+            var sql = $"SELECT * FROM Loans WHERE UserEmail = @UserEmail and BIC = @Bic";
 
             using (var command = new SqliteCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@UserEmail", userEmail);
+                command.Parameters.AddWithValue("@Bic", bic);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -104,50 +106,64 @@ public class LoanRepository : ILoanRepository
         return loans;
     }
     
-    // Get all pending loans (not approved yet)
-    public async Task<List<Loan>> GetPendingLoansAsync(string tableName)
-    {
-        var loans = new List<Loan>();
+// Get all pending loans (not approved yet) for a specific BIC
+public async Task<List<Loan>> GetPendingLoansAsync(string bic)
+{
+    var loans = new List<Loan>();
 
+    try
+    {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
             
-            var sql = $"SELECT * FROM {tableName} WHERE Approved = 0";  // Retrieve only unapproved loans
-            
+            var sql = @"SELECT * FROM Loans WHERE Approved = 0 AND BIC = @BIC";
+
             using (var command = new SqliteCommand(sql, connection))
-            using (var reader = await command.ExecuteReaderAsync())
             {
-                while (await reader.ReadAsync())
+                command.Parameters.AddWithValue("@BIC", bic);
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    var loan = new Loan
+                    while (await reader.ReadAsync())
                     {
-                        LoanId = reader.GetString(1),
-                        TypeOfLoan = reader.GetInt32(2),
-                        TypeOfPercent = reader.GetInt32(3),
-                        Percent = reader.GetDouble(4),
-                        Amount = reader.GetDouble(5),
-                        DurationMonths = reader.GetInt32(6),
-                        Purpose = reader.GetString(7),
-                        UserEmail = reader.GetString(8),
-                        Approved = false
-                    };
-                    loans.Add(loan);
+                        var loan = new Loan
+                        {
+                            LoanId = reader.GetString(reader.GetOrdinal("LoanId")),
+                            TypeOfLoan = reader.GetInt32(reader.GetOrdinal("TypeOfLoan")),
+                            TypeOfPercent = reader.GetInt32(reader.GetOrdinal("TypeOfPercent")),
+                            Percent = reader.GetDouble(reader.GetOrdinal("Percent")),
+                            Amount = reader.GetDouble(reader.GetOrdinal("Amount")),
+                            DurationMonths = reader.GetInt32(reader.GetOrdinal("DurationMonths")),
+                            Purpose = reader.GetString(reader.GetOrdinal("Purpose")),
+                            UserEmail = reader.GetString(reader.GetOrdinal("UserEmail")),
+                            Approved = false 
+                        };
+
+                        loans.Add(loan);
+                    }
                 }
             }
         }
-
-        return loans;
     }
+    catch (Exception ex)
+    {
+        // Log the exception (you can use a logging framework like Serilog, NLog, etc.)
+        Console.WriteLine($"An error occurred while retrieving pending loans: {ex.Message}");
+        throw; 
+    }
+
+    return loans;
+}
     
     // Update the approval status of a loan (Approve or Disapprove)
-    public async Task<bool> UpdateLoanApprovalStatusAsync(string tableName, string loanId, bool isApproved)
+    public async Task<bool> UpdateLoanApprovalStatusAsync(string loanId, bool isApproved)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
             
-            var sql = $"UPDATE {tableName} SET Approved = @Approved WHERE LoanId = @LoanId";
+            var sql = @"UPDATE Loans SET Approved = @Approved WHERE LoanId = @LoanId";
 
             using (var command = new SqliteCommand(sql, connection))
             {
@@ -158,4 +174,23 @@ public class LoanRepository : ILoanRepository
             }
         }
     }
+    
+    // Update the time stamp status of a loan
+    public async Task<bool> UpdateLoanTimestampAsync(string loanId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+        
+            var sql = @"UPDATE Loans SET Timestamp = CURRENT_TIMESTAMP WHERE LoanId = @LoanId";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@LoanId", loanId);
+
+                return await command.ExecuteNonQueryAsync() > 0;
+            }
+        }
+    }
+    
 }

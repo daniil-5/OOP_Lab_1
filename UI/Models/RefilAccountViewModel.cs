@@ -1,17 +1,22 @@
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.Maui.Controls;
 using OOP_Lab_1.Core.Entities;
 using OOP_Lab_1.Core.Interfaces;
 using OOP_Lab_1.UI.Models;
 
-namespace OOP_Lab_1.UI.ViewModels
+namespace OOP_Lab_1.UI.Models
 {
-    public class WithdrawViewModel : BaseViewModel
+    public class RefilAccountViewModel : BaseViewModel
     {
         private readonly IAccountService _accountService;
-        private string _bankId;
         private string _userEmail;
-        private double _withdrawAmount;
+        private string _bankId;
+        private double _refillAmount;
         private string _statusMessage;
         private UserAccount _selectedAccount;
 
@@ -30,15 +35,15 @@ namespace OOP_Lab_1.UI.ViewModels
             }
         }
 
-        public double WithdrawAmount
+        public double RefillAmount
         {
-            get => _withdrawAmount;
+            get => _refillAmount;
             set
             {
-                if (_withdrawAmount != value)
+                if (_refillAmount != value)
                 {
-                    _withdrawAmount = value;
-                    OnPropertyChanged(nameof(WithdrawAmount));
+                    _refillAmount = value;
+                    OnPropertyChanged(nameof(RefillAmount));
                 }
             }
         }
@@ -56,12 +61,12 @@ namespace OOP_Lab_1.UI.ViewModels
             }
         }
 
-        public ICommand WithdrawCommand { get; }
+        public ICommand RefillCommand { get; }
 
-        public WithdrawViewModel(IAccountService accountService)
+        public RefilAccountViewModel(IAccountService accountService)
         {
             _accountService = accountService;
-            WithdrawCommand = new Command(async () => await WithdrawAsync());
+            RefillCommand = new Command(async () => await RefillAsync());
         }
 
         public async Task LoadAccountsAsync()
@@ -80,7 +85,7 @@ namespace OOP_Lab_1.UI.ViewModels
             }
         }
 
-        private async Task WithdrawAsync()
+        private async Task RefillAsync()
         {
             if (SelectedAccount == null)
             {
@@ -88,7 +93,7 @@ namespace OOP_Lab_1.UI.ViewModels
                 return;
             }
 
-            if (WithdrawAmount <= 0)
+            if (RefillAmount <= 0)
             {
                 StatusMessage = "Amount must be greater than zero.";
                 return;
@@ -106,24 +111,18 @@ namespace OOP_Lab_1.UI.ViewModels
                 return;
             }
 
-            if (SelectedAccount.Balance < WithdrawAmount)
-            {
-                StatusMessage = "Insufficient funds.";
-                return;
-            }
-
             Console.WriteLine(SelectedAccount.AccountNumber);
-            bool success = await _accountService.WithdrawAsync(SelectedAccount.AccountNumber, WithdrawAmount);
+            bool success = await _accountService.RefillAsync(SelectedAccount.AccountNumber, RefillAmount);
             if (success)
             {
-                StatusMessage = "Withdrawal successful.";
-                SelectedAccount.Balance -= WithdrawAmount;
+                StatusMessage = "Refilling successful.";
+                SelectedAccount.Balance += RefillAmount;
                 OnPropertyChanged(nameof(SelectedAccount));
                 LoadAccountsAsync();
             }
             else
             {
-                StatusMessage = "Withdrawal failed. Please try again.";
+                StatusMessage = "Refilling failed. Please try again.";
             }
         }
         
@@ -135,6 +134,7 @@ namespace OOP_Lab_1.UI.ViewModels
             }
             _userEmail = email;
         }
+
         public void ApplyBIC(string bankId)
         {
             if (string.IsNullOrEmpty(bankId))

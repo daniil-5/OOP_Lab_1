@@ -15,9 +15,12 @@ namespace OOP_Lab_1.UI.Models
         private double _transferAmount;
         private string _statusMessage;
         private Color _statusColor;
+        private string _userEmail;
+        private string _bankId;
 
+        public ObservableCollection<UserAccount> MyAccounts { get; private set; } = new ObservableCollection<UserAccount>();
         public ObservableCollection<UserAccount> Accounts { get; private set; } = new ObservableCollection<UserAccount>();
-
+        
         public UserAccount SelectedFromAccount
         {
             get => _selectedFromAccount;
@@ -89,17 +92,41 @@ namespace OOP_Lab_1.UI.Models
         {
             _accountService = accountService;
             TransferCommand = new Command(async () => await TransferAsync());
-            LoadAccountsAsync().Wait();
+            // LoadAccountsAsync().Wait();
         }
 
         public async Task LoadAccountsAsync()
         {
-            var accounts = await _accountService.GetAllAccountsAsync();
-            Accounts.Clear();
-            foreach (var account in accounts)
+            
+            try
             {
-                Accounts.Add(account);
+                var accounts = await _accountService.GetAllAccountsAsync();
+                Accounts.Clear();
+                if (accounts != null && accounts.Any())
+                {
+                    foreach (var account in accounts)
+                    {
+                        Accounts.Add(account);
+                    }
+                }
+                else
+                {
+                    // await DisplayAlert("No Accounts", "You have no accounts to close.", "OK");
+                    await Shell.Current.GoToAsync("..");
+                }
             }
+            catch (Exception ex)
+            {
+                // await DisplayAlert("Error", $"Failed to load accounts: {ex.Message}", "OK");
+            }
+            
+            var myaccounts = await _accountService.GetAccountsByEmailAsync(_userEmail, _bankId);
+            MyAccounts.Clear();
+            foreach (var acc in myaccounts)
+            {
+                MyAccounts.Add(acc);
+            }
+            
         }
 
         private async Task TransferAsync()
@@ -130,7 +157,23 @@ namespace OOP_Lab_1.UI.Models
                 StatusColor = Colors.Red;
             }
         }
-
+        public void ApplyUserEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException("User email cannot be null or empty.");
+            }
+            _userEmail = email;
+        }
+        
+        public void ApplyBic(string bankId)
+        {
+            if (string.IsNullOrEmpty(bankId))
+            {
+                throw new ArgumentException("BankId cannot be null or empty.");
+            }
+            _bankId = bankId;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

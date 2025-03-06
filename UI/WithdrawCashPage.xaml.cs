@@ -12,14 +12,12 @@ namespace OOP_Lab_1.UI
     {
         private string _bankId = "Unknown";
         private User _currentUser;
-        private readonly IAccountService _accountService;
         private WithdrawViewModel _viewModel;
 
         public WithdrawCashPage(IAccountService accountService)
         {
             InitializeComponent();
-            _accountService = accountService;
-            _viewModel = new WithdrawViewModel(_accountService);
+            _viewModel = new WithdrawViewModel(accountService);
             BindingContext = _viewModel;
         }
 
@@ -36,11 +34,9 @@ namespace OOP_Lab_1.UI
 
             if (_currentUser != null)
             {
-                string tableName = $"{_bankId}_UserAccounts";
-                Console.WriteLine(tableName);
-                _viewModel.ApplyTableName(tableName);
                 _viewModel.ApplyUserEmail(_currentUser.Email);
-                _viewModel.LoadAccountsAsync();
+                _viewModel.ApplyBIC(_bankId);
+                _ = _viewModel.LoadAccountsAsync();
             }
         }
     }

@@ -9,21 +9,21 @@ using OOP_Lab_1.UI.Models;
 
 namespace OOP_Lab_1.UI;
 
-public partial class TransferPage : ContentPage, IQueryAttributable
+public partial class RefilAccountPage : ContentPage, IQueryAttributable
 {
     private string _bankId = "Unknown";
     private User _currentUser;
     private readonly IAccountService _accountService;
-    private TransferViewModel _viewModel;
-    
-    public TransferPage(IAccountService accountService)
+    private RefilAccountViewModel _viewModel;
+
+    public RefilAccountPage(IAccountService accountService)
     {
         InitializeComponent();
         _accountService = accountService;
-        _viewModel = new TransferViewModel(accountService);
+        _viewModel = new RefilAccountViewModel(_accountService);
         BindingContext = _viewModel;
     }
-    
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.ContainsKey("BankId"))
@@ -38,7 +38,7 @@ public partial class TransferPage : ContentPage, IQueryAttributable
         if (_currentUser != null)
         {
             _viewModel.ApplyUserEmail(_currentUser.Email);
-            _viewModel.ApplyBic(_bankId);
+            _viewModel.ApplyBIC(_bankId);
             _ = _viewModel.LoadAccountsAsync();
         }
     }

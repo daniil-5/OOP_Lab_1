@@ -21,14 +21,23 @@ public class AccountService : IAccountService
 
         return await _accountRepository.WithdrawAsync(accountId, amount);
     }
+    
+    // Method to refill money 
+    public async Task<bool> RefillAsync(string accountId, double amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+
+        return await _accountRepository.RefillAsync(accountId, amount);
+    }
 
     // Get accounts by email
-    public async Task<List<UserAccount>> GetAccountsByEmailAsync(string email)
+    public async Task<List<UserAccount>> GetAccountsByEmailAsync(string email, string bankId)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty.", nameof(email));
 
-        return await _accountRepository.GetAccountsByEmailAsync(email);
+        return await _accountRepository.GetAccountsByEmailAsync(email, bankId);
     }
     
     // Get all accounts

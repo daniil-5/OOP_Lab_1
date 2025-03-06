@@ -15,32 +15,38 @@ public class LoanService :ILoanService
     }
 
     // Fetch pending loans (not approved yet)
-    public async Task<List<Loan>> GetPendingLoansAsync(string tableName)
+    public async Task<List<Loan>> GetPendingLoansAsync(string bic)
     {
-        return await _loanRepository.GetPendingLoansAsync(tableName);
+        return await _loanRepository.GetPendingLoansAsync(bic);
     }
 
     // Update loan approval status (approve or disapprove)
-    public async Task<bool> UpdateLoanApprovalStatusAsync(string tableName, string loanId, bool isApproved)
+    public async Task<bool> UpdateLoanApprovalStatusAsync(string loanId, bool isApproved)
     {
-        return await _loanRepository.UpdateLoanApprovalStatusAsync(tableName, loanId, isApproved);
+        return await _loanRepository.UpdateLoanApprovalStatusAsync(loanId, isApproved);
     }
 
     // Cancel a loan (remove from database)
-    public async Task<bool> CancelLoanAsync(string tableName, string loanId)
+    public async Task<bool> CancelLoanAsync(string loanId)
     {
-        return await _loanRepository.CancelLoanAsync(tableName, loanId);
+        return await _loanRepository.CancelLoanAsync(loanId);
     }
 
     // Add a new loan to the database
-    public async Task<bool> AddLoanAsync(string tableName, Loan loan)
+    public async Task<bool> AddLoanAsync(Loan loan, string bic)
     {
-        return await _loanRepository.AddLoanAsync(tableName, loan);
+        return await _loanRepository.AddLoanAsync(loan, bic);
     }
 
     // Get loans by user email (for a specific user)
-    public async Task<List<Loan>> GetLoansByUserEmailAsync(string tableName, string userEmail)
+    public async Task<List<Loan>> GetLoansByEmailAsync(string userEmail, string bic)
     {
-        return await _loanRepository.GetLoansByEmailAsync(tableName, userEmail);
+        return await _loanRepository.GetLoansByEmailAsync(userEmail, bic);
+    }
+    
+    // Update the loan timestamp
+    public async Task<bool> UpdateLoanTimestampAsync(string loanId)
+    {
+        return await _loanRepository.UpdateLoanTimestampAsync(loanId);
     }
 }

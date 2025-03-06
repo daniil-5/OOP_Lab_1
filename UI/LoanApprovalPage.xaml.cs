@@ -19,14 +19,13 @@ public partial class LoanApprovalPage : ContentPage, IQueryAttributable
         _viewModel = new LoanApprovalViewModel(loanService);
         BindingContext = _viewModel;
     }
-
-    // Receive the query attributes, typically from navigation
+    
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.ContainsKey("BankId"))
         {
             var bankId = query["BankId"] as string;
-            _viewModel.ApplyBankId(bankId); // Apply Bank ID to ViewModel
+            _viewModel.ApplyBic(bankId);
         }
     }
 }

@@ -7,36 +7,31 @@
     <ContentPage.Content>
         <ScrollView>
             <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-
-                <!-- Source Account Picker -->
+                
                 <Label Text="From Account:" FontAttributes="Bold"/>
                 <Picker x:Name="FromAccountPicker"
-                        ItemsSource="{Binding Accounts}"
+                        ItemsSource="{Binding MyAccounts}"
                         ItemDisplayBinding="{Binding AccountNumber}"
                         SelectedItem="{Binding SelectedFromAccount, Mode=TwoWay}"/>
-
-                <!-- Destination Account Picker -->
+                
                 <Label Text="To Account:" FontAttributes="Bold"/>
                 <Picker x:Name="ToAccountPicker"
                         ItemsSource="{Binding Accounts}"
                         ItemDisplayBinding="{Binding AccountNumber}"
                         SelectedItem="{Binding SelectedToAccount, Mode=TwoWay}"/>
-
-                <!-- Amount Entry -->
+                
                 <Label Text="Amount:" FontAttributes="Bold"/>
                 <Entry Text="{Binding TransferAmount, Mode=TwoWay}" 
                        Keyboard="Numeric"
                        Placeholder="Enter amount"/>
-
-                <!-- Transfer Button -->
+                
                 <Button Text="Transfer" 
                         Command="{Binding TransferCommand}"
                         BackgroundColor="Green"
                         TextColor="White"
                         FontAttributes="Bold"
                         HorizontalOptions="Center"/>
-
-                <!-- Status Message -->
+                
                 <Label Text="{Binding StatusMessage}" 
                        TextColor="{Binding StatusColor}"
                        FontSize="Small"

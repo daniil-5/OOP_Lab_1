@@ -2,33 +2,34 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OOP_Lab_1.UI.RegistrationPage"
-             Title="Registaration">
+             Title="Registration">
+
+    <ContentPage.Content>
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-            
+
             <Label Text="Full Name" FontAttributes="Bold" />
-            <Entry x:Name="FullNameEntry" Placeholder="Enter your full name" />
-            
+            <Entry Text="{Binding FullName}" Placeholder="Enter your full name" />
+
             <Label Text="Passport Number" FontAttributes="Bold" />
-            <Entry x:Name="PassportNumberEntry" Placeholder="Enter passport number" />
-            
+            <Entry Text="{Binding PassportNumber}" Placeholder="Enter passport number" />
+
             <Label Text="Identification Number" FontAttributes="Bold" />
-            <Entry x:Name="IdentificationNumberEntry" Placeholder="Enter identification number" />
-            
+            <Entry Text="{Binding IdentificationNumber}" Placeholder="Enter identification number" />
+
             <Label Text="Phone" FontAttributes="Bold" />
-            <Entry x:Name="PhoneEntry" Placeholder="Enter phone number" />
-            
+            <Entry Text="{Binding Phone}" Placeholder="Enter phone number" />
+
             <Label Text="Email" FontAttributes="Bold" />
-            <Entry x:Name="EmailEntry" Placeholder="Enter email" Keyboard="Email" />
-            
+            <Entry Text="{Binding Email}" Placeholder="Enter email" Keyboard="Email" />
+
             <Label Text="Password" FontAttributes="Bold" />
-            <Entry x:Name="PasswordEntry" Placeholder="Enter password" IsPassword="True" />
-            
+            <Entry Text="{Binding Password}" Placeholder="Enter password" IsPassword="True" />
+
             <Label Text="Role" FontAttributes="Bold" />
-            <Picker x:Name="RolePicker"
-                    
-                    HorizontalOptions="FillAndExpand" 
-                    VerticalOptions="Center" 
+            <Picker SelectedIndex="{Binding SelectedRoleIndex}"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="Center"
                     HeightRequest="40">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type x:String}">
@@ -36,14 +37,16 @@
                         <x:String>Operator</x:String>
                         <x:String>Manager</x:String>
                         <x:String>External Specialist</x:String>
-                        <x:String>Administarator</x:String>
+                        <x:String>Administrator</x:String>
                     </x:Array>
                 </Picker.ItemsSource>
             </Picker>
 
-   
-            <Button Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="FillAndExpand" />
+            <Label Text="{Binding StatusMessage}" TextColor="Red" />
+
+            <Button Text="Register" Command="{Binding RegisterCommand}" HorizontalOptions="FillAndExpand" />
 
         </VerticalStackLayout>
     </ScrollView>
+    </ContentPage.Content>
 </ContentPage>
