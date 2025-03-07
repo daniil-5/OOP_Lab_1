@@ -34,8 +34,8 @@ namespace OOP_Lab_1
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegistrationViewModel>();
             builder.Services.AddTransient<RegistrationApprovalPage>();
-            builder.Services.AddTransient<UserApprovalViewModel>();
             builder.Services.AddTransient<RegistrationPage>();
+            builder.Services.AddTransient<TransactionStatisticsPage>();
             
             
             builder.Services.AddSingleton<IAccountRepository>(sp => new AccountRepository(_databasePath));

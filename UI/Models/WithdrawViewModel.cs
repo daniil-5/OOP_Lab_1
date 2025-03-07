@@ -135,7 +135,7 @@ namespace OOP_Lab_1.UI.ViewModels
             }
             _userEmail = email;
         }
-        public void ApplyBIC(string bankId)
+        public void ApplyBic(string bankId)
         {
             if (string.IsNullOrEmpty(bankId))
             {

@@ -35,7 +35,7 @@ namespace OOP_Lab_1.UI
             if (_currentUser != null)
             {
                 _viewModel.ApplyUserEmail(_currentUser.Email);
-                _viewModel.ApplyBIC(_bankId);
+                _viewModel.ApplyBic(_bankId);
                 _ = _viewModel.LoadAccountsAsync();
             }
         }

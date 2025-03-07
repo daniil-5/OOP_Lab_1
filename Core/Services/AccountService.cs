@@ -84,4 +84,10 @@ public class AccountService : IAccountService
         
         return await _accountRepository.TransferAsync(fromAccountNumber, toAccountNumber, amount);
     }
+    
+    // Get all transactions
+    public async Task<List<Transaction>> GetAllTransactionsAsync()
+    {
+        return await _accountRepository.GetAllTransactionsAsync();
+    }
 }

@@ -19,6 +19,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("transfer", typeof(TransferPage));
         Routing.RegisterRoute("refillBalance", typeof(RefilAccountPage));
         Routing.RegisterRoute("UserApprovement", typeof(RegistrationApprovalPage));
+        Routing.RegisterRoute("transactionStat", typeof(TransactionStatisticsPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()

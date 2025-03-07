@@ -9,16 +9,12 @@ public partial class MainPage : ContentPage, IQueryAttributable
 {
     private string _selectedBank;
     private string _bankId;
-    
     private User _currentUser;
-
-
     
     public MainPage()
     {
         InitializeComponent();
     }
-
     
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -41,7 +37,7 @@ public partial class MainPage : ContentPage, IQueryAttributable
     
     private async void CreateRoleButtons()
     {
-        if (_currentUser.Role == 0)
+        if (_currentUser.Role == 0) // client
         {
             CreateNavigationButton("Open new Account", "openAccount");
             CreateNavigationButton("Close account", "closeAccount");
@@ -52,32 +48,31 @@ public partial class MainPage : ContentPage, IQueryAttributable
             CreateNavigationButton("Refill Balance", "refillBalance");
         }
         
-        if (_currentUser.Role == 2)
+        if (_currentUser.Role == 2) // manager
         {
             CreateNavigationButton("Approve Loan", "LoanApprovement");
             CreateNavigationButton("Approve Registaration", "UserApprovement");
             // CreateNavigationButton("Cancel External Transactions", nameof(CancelExternalTransactionPage));
         }
         
-        // if (_currentUser.Role == 1)
-        // {
-        //     CreateNavigationButton("View Transaction Statistics", nameof(TransactionStatisticsPage));
-        //     CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage));
-        // }
-        //
-        // if (_currentUser.Role == 3)
+        if (_currentUser.Role == 1) // operator
+        {
+            CreateNavigationButton("View Transaction Statistics", "transactionStat");
+            // CreateNavigationButton("Confirm Salary Project", nameof(ConfirmSalaryProjectPage));
+        }
+        
+        // if (_currentUser.Role == 3) // external specialist
         // {
         //     CreateNavigationButton("Submit Salary Project Documents", nameof(SubmitDocsForSalaryProjectPage));
         //     CreateNavigationButton("Request Transfer", nameof(RequestFundTransferPage));
         // }
         //
-        // if (_currentUser.Role == 4)
+        // if (_currentUser.Role == 4) //admin
         // {
         //     CreateNavigationButton("View Logs", nameof(ViewLogsPage));
         //     CreateNavigationButton("Cancel User Actions", nameof(CancelUserActionsPage));
         // }
-
-        // Logout Button
+        
         Button logoutButton = new Button
         {
             Text = "Logout",

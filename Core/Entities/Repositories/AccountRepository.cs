@@ -379,7 +379,7 @@ public async Task<bool> TransferAsync(string fromAccountId, string toAccountId, 
                     if (deductRowsAffected == 0)
                     {
                         await transaction.RollbackAsync(); // Rollback the transaction
-                        return false; // Failed to deduct from source account
+                        return false; 
                     }
                 }
 
@@ -398,7 +398,7 @@ public async Task<bool> TransferAsync(string fromAccountId, string toAccountId, 
                     if (addRowsAffected == 0)
                     {
                         await transaction.RollbackAsync(); // Rollback the transaction
-                        return false; // Failed to add to destination account
+                        return false; 
                     }
                 }
 
@@ -431,7 +431,6 @@ public async Task<bool> TransferAsync(string fromAccountId, string toAccountId, 
 
 public async Task<bool> RefillAsync(string accountId, double amount)
 {
-    // Validate input parameters
     if (string.IsNullOrEmpty(accountId))
         throw new ArgumentException("Account ID cannot be null or empty.", nameof(accountId));
 
@@ -441,13 +440,11 @@ public async Task<bool> RefillAsync(string accountId, double amount)
     using (var connection = new SqliteConnection(_connectionString))
     {
         await connection.OpenAsync();
-
-        // Begin a transaction
+        
         using (var transaction = (SqliteTransaction)await connection.BeginTransactionAsync())
         {
             try
             {
-                // Check account status
                 var checkSql = @"
                     SELECT IsBlocked, IsFrozen 
                     FROM UserAccounts 
@@ -502,9 +499,42 @@ public async Task<bool> RefillAsync(string accountId, double amount)
             catch (Exception)
             {
                 await transaction.RollbackAsync(); // Rollback the transaction in case of an error
-                throw; // Re-throw the exception
+                throw;
             }
         }
     }
 }
+
+public async Task<List<Transaction>> GetAllTransactionsAsync()
+{
+    List<Transaction> transactions = new List<Transaction>();
+    using (var connection = new SqliteConnection(_connectionString))
+    {
+        await connection.OpenAsync();
+
+        var sql = @"SELECT * FROM Transfers WHERE Status = @Status;";
+
+        using (var command = new SqliteCommand(sql, connection))
+        {
+            command.Parameters.AddWithValue("@Status", "Success");
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    transactions.Add( new Transaction
+                        {
+                        FromAccountId = reader.GetString(1),
+                        ToAccountId = reader.GetString(2),
+                        Amount = reader.GetDouble(3),
+                        Date = reader.GetDateTime(4)
+                        }
+                    );
+                }
+            }
+        }
+    }
+    return transactions;
+}
+
 }

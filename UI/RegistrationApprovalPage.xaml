@@ -8,8 +8,8 @@
             
             <Grid RowSpacing="10" ColumnSpacing="20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> <!-- Header row -->
-                    <RowDefinition Height="*" />    <!-- ListView row -->
+                    <RowDefinition Height="Auto" /> 
+                    <RowDefinition Height="*" /> 
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*" />

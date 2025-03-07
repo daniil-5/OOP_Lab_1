@@ -19,4 +19,6 @@ public interface IAccountService
     Task<bool> RefillAsync(string accountId, double amount);
     
     Task<bool> TransferAsync(string fromAccountId, string toAccountId, double amount);
+    
+    Task<List<Transaction>> GetAllTransactionsAsync();
 }
