@@ -17,7 +17,7 @@ public interface IBanksService
     /// <summary>
     /// Creates a new bank table in the database using a raw SQL query.
     /// </summary>
-    Task CreateBankTableAsync(string id);
+    Task<bool> CreateBankTableAsync(string id);
         
     /// <summary>
     /// Removes the bank from the database using a raw SQL query.
@@ -29,6 +29,4 @@ public interface IBanksService
     /// </summary>
     Task<bool> UpdateBankAsync(Bank bank);
     
-    Task CreateAccountTableAsync();
-    Task CreateLoanTableAsync();
 }

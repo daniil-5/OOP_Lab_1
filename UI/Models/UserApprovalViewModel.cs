@@ -33,7 +33,6 @@ public class UserApprovalViewModel : BaseViewModel
     // Load Pending Users from the Service
     private async void LoadUsers()
     {
-        Console.WriteLine("Loading Users");
         var pendingUsers = await _userService.GetPendingUsersAsync(_bic);
         Users.Clear();
         foreach (var User in pendingUsers)

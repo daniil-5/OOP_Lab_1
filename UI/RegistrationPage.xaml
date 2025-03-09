@@ -5,48 +5,70 @@
              Title="Registration">
 
     <ContentPage.Content>
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+        <ScrollView>
+            <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
-            <Label Text="Full Name" FontAttributes="Bold" />
-            <Entry Text="{Binding FullName}" Placeholder="Enter your full name" />
+                <!-- Full Name -->
+                <Label Text="Full Name" FontAttributes="Bold" />
+                <Entry Text="{Binding FullName}" Placeholder="Enter your full name" />
 
-            <Label Text="Passport Number" FontAttributes="Bold" />
-            <Entry Text="{Binding PassportNumber}" Placeholder="Enter passport number" />
+                <!-- Passport Number -->
+                <Label Text="Passport Number" FontAttributes="Bold" />
+                <Entry Text="{Binding PassportNumber}" Placeholder="Enter passport number" />
 
-            <Label Text="Identification Number" FontAttributes="Bold" />
-            <Entry Text="{Binding IdentificationNumber}" Placeholder="Enter identification number" />
+                <!-- Identification Number -->
+                <Label Text="Identification Number" FontAttributes="Bold" />
+                <Entry Text="{Binding IdentificationNumber}" Placeholder="Enter identification number" />
 
-            <Label Text="Phone" FontAttributes="Bold" />
-            <Entry Text="{Binding Phone}" Placeholder="Enter phone number" />
+                <!-- Phone -->
+                <Label Text="Phone" FontAttributes="Bold" />
+                <Entry Text="{Binding Phone}" Placeholder="Enter phone number" />
 
-            <Label Text="Email" FontAttributes="Bold" />
-            <Entry Text="{Binding Email}" Placeholder="Enter email" Keyboard="Email" />
+                <!-- Email -->
+                <Label Text="Email" FontAttributes="Bold" />
+                <Entry Text="{Binding Email}" Placeholder="Enter email" Keyboard="Email" />
 
-            <Label Text="Password" FontAttributes="Bold" />
-            <Entry Text="{Binding Password}" Placeholder="Enter password" IsPassword="True" />
+                <!-- Password -->
+                <Label Text="Password" FontAttributes="Bold" />
+                <Entry Text="{Binding Password}" Placeholder="Enter password" IsPassword="True" />
 
-            <Label Text="Role" FontAttributes="Bold" />
-            <Picker SelectedIndex="{Binding SelectedRoleIndex}"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="Center"
-                    HeightRequest="40">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>Client</x:String>
-                        <x:String>Operator</x:String>
-                        <x:String>Manager</x:String>
-                        <x:String>External Specialist</x:String>
-                        <x:String>Administrator</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+                <!-- Role -->
+                <Label Text="Role" FontAttributes="Bold" />
+                <Picker SelectedIndex="{Binding SelectedRoleIndex}"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="Center"
+                        HeightRequest="40">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Client</x:String>
+                            <x:String>Operator</x:String>
+                            <x:String>Manager</x:String>
+                            <x:String>External Specialist</x:String>
+                            <x:String>Administrator</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
 
-            <Label Text="{Binding StatusMessage}" TextColor="Red" />
+                <!-- Enterprise Picker (Visible only for External Specialist) -->
+                <Label Text="Enterprise" FontAttributes="Bold" IsVisible="{Binding IsEnterprisePickerVisible}" />
+                <Picker ItemsSource="{Binding Enterprises}"
+                        SelectedItem="{Binding SelectedEnterprise}"
+                        IsVisible="{Binding IsEnterprisePickerVisible}"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="Center"
+                        HeightRequest="40">
+                    <Picker.ItemDisplayBinding>
+                        <Binding Path="LegalName" />
+                    </Picker.ItemDisplayBinding>
+                </Picker>
 
-            <Button Text="Register" Command="{Binding RegisterCommand}" HorizontalOptions="FillAndExpand" />
+                <!-- Status Message -->
+                <Label Text="{Binding StatusMessage}" TextColor="Red" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <!-- Register Button -->
+                <Button Text="Register" Command="{Binding RegisterCommand}" HorizontalOptions="FillAndExpand" />
+
+            </VerticalStackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

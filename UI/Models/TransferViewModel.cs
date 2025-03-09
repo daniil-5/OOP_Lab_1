@@ -92,7 +92,6 @@ namespace OOP_Lab_1.UI.Models
         {
             _accountService = accountService;
             TransferCommand = new Command(async () => await TransferAsync());
-            // LoadAccountsAsync().Wait();
         }
 
         public async Task LoadAccountsAsync()
@@ -111,7 +110,6 @@ namespace OOP_Lab_1.UI.Models
                 }
                 else
                 {
-                    // await DisplayAlert("No Accounts", "You have no accounts to close.", "OK");
                     await Shell.Current.GoToAsync("..");
                 }
             }

@@ -4,6 +4,7 @@ namespace OOP_Lab_1.Core.Interfaces;
 
 public interface IEnterprise
 {
+    int Id { get; set; }
     string LegalName { get; set; }
     string Type { get; set; }
     string UNP { get; set; }

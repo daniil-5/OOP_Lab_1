@@ -20,7 +20,7 @@ public class JwtService
         };
 
         var token = new JwtSecurityToken(
-            issuer: "your-issuer",  // You can put your app name or domain here
+            issuer: "your-issuer", 
             audience: "your-audience",
             claims: claims,
             expires: DateTime.Now.AddHours(1),

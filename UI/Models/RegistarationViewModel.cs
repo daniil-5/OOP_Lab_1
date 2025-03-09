@@ -1,9 +1,10 @@
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using OOP_Lab_1.Core.Entities;
 using OOP_Lab_1.Core.Interfaces;
-using System.Windows.Input;
+using OOP_Lab_1.UI.Models;
 
-
-namespace OOP_Lab_1.UI.Models
+namespace OOP_Lab_1.UI.ViewModels
 {
     public class RegistrationViewModel : BaseViewModel
     {
@@ -17,6 +18,9 @@ namespace OOP_Lab_1.UI.Models
         private string _password;
         private int _selectedRoleIndex = -1;
         private string _statusMessage;
+        private bool _isEnterprisePickerVisible;
+        private ObservableCollection<Enterprise> _enterprises;
+        private Enterprise _selectedEnterprise;
 
         public string FullName
         {
@@ -105,6 +109,7 @@ namespace OOP_Lab_1.UI.Models
                 {
                     _selectedRoleIndex = value;
                     OnPropertyChanged(nameof(SelectedRoleIndex));
+                    OnSelectedRoleIndexChanged(value);
                 }
             }
         }
@@ -122,6 +127,46 @@ namespace OOP_Lab_1.UI.Models
             }
         }
 
+        public bool IsEnterprisePickerVisible
+        {
+            get => _isEnterprisePickerVisible;
+            set
+            {
+                if (_isEnterprisePickerVisible != value)
+                {
+                    _isEnterprisePickerVisible = value;
+                    _ = LoadEnterprisesAsync();
+                    OnPropertyChanged(nameof(IsEnterprisePickerVisible));
+                }
+            }
+        }
+
+        public ObservableCollection<Enterprise> Enterprises
+        {
+            get => _enterprises;
+            set
+            {
+                if (_enterprises != value)
+                {
+                    _enterprises = value;
+                    OnPropertyChanged(nameof(Enterprises));
+                }
+            }
+        }
+
+        public Enterprise SelectedEnterprise
+        {
+            get => _selectedEnterprise;
+            set
+            {
+                if (_selectedEnterprise != value)
+                {
+                    _selectedEnterprise = value;
+                    OnPropertyChanged(nameof(SelectedEnterprise));
+                }
+            }
+        }
+
         public string BankId { get; set; } = "Unknown";
 
         public ICommand RegisterCommand { get; }
@@ -130,6 +175,20 @@ namespace OOP_Lab_1.UI.Models
         {
             _userService = userService;
             RegisterCommand = new Command(async () => await RegisterAsync());
+
+            // Initialize the Enterprises collection
+            Enterprises = new ObservableCollection<Enterprise>();
+            
+        }
+
+        private async Task LoadEnterprisesAsync()
+        {
+            // Fetch enterprises from the database
+            var enterprises = await _userService.GetEnterprisesAsync(BankId);
+            foreach (var enterprise in enterprises)
+            {
+                Enterprises.Add(enterprise);
+            }
         }
 
         private async Task RegisterAsync()
@@ -148,6 +207,16 @@ namespace OOP_Lab_1.UI.Models
                     return;
                 }
 
+                // Additional validation for External Specialist
+                if (SelectedRoleIndex == 3 && SelectedEnterprise == null) // "External Specialist" is at index 3
+                {
+                    StatusMessage = "Please select an enterprise.";
+                    return;
+                }
+
+                // Hash the password (use a proper hashing algorithm in production)
+                string hashedPassword = HashPassword(Password);
+                
                 if (!IsValidEmail(Email))
                 {
                     StatusMessage = "Please enter a valid email address.";
@@ -160,13 +229,13 @@ namespace OOP_Lab_1.UI.Models
                     return;
                 }
 
-                bool userExists = await _userService.UserExistsByEmailAsync(Email, BankId);
-                if (userExists)
+                var userExists = await _userService.UserExistsByEmailAsync(Email, BankId);
+                if (userExists != null)
                 {
                     StatusMessage = "A user with this email already exists.";
                     return;
                 }
-
+                
                 var newUser = new User
                 {
                     FullName = FullName,
@@ -174,27 +243,33 @@ namespace OOP_Lab_1.UI.Models
                     IdentificationNumber = IdentificationNumber,
                     Phone = Phone,
                     Email = Email,
-                    Password = Password, // Note: Hash the password before saving in a real app
+                    Password = hashedPassword,
                     Role = SelectedRoleIndex
                 };
 
-                bool isAdded = await _userService.RegisterUserAsync(newUser, BankId);
-                if (isAdded)
+    
+                bool isRegistered = await _userService.RegisterUserAsync(newUser, BankId);
+                if (isRegistered)
                 {
                     StatusMessage = $"User {FullName} registered as {GetStringRole(SelectedRoleIndex)}.";
                     await Shell.Current.DisplayAlert("Registration successful", $"User {FullName} registered as {GetStringRole(SelectedRoleIndex)}.", "OK");
+                    if (SelectedRoleIndex == 3)
+                    {
+                        var user = await _userService.UserExistsByEmailAsync(Email, BankId);
+                        await _userService.AddExternalSpecialistAsync(user.Id, SelectedEnterprise.Id);
+                    }
                     ClearForm();
-                    // await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Registration failed", "Failed to register the user. Please try again", "OK");
+                    await Shell.Current.DisplayAlert("Registration failed", "Failed to register the user. Please try again.", "OK");
                     StatusMessage = "Failed to register the user. Please try again.";
                 }
+                
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Registration failed", "Failed to register the user. Please try again", "OK");
+                await Shell.Current.DisplayAlert("Registration failed", $"An error occurred: {ex.Message}", "OK");
                 StatusMessage = $"An error occurred: {ex.Message}";
             }
         }
@@ -212,6 +287,11 @@ namespace OOP_Lab_1.UI.Models
             }
         }
 
+        private void OnSelectedRoleIndexChanged(int value)
+        {
+            IsEnterprisePickerVisible = value == 3; // "External Specialist" is at index 3
+        }
+
         private void ClearForm()
         {
             FullName = string.Empty;
@@ -221,6 +301,7 @@ namespace OOP_Lab_1.UI.Models
             Email = string.Empty;
             Password = string.Empty;
             SelectedRoleIndex = -1;
+            SelectedEnterprise = null;
         }
 
         private static string GetStringRole(int role)
@@ -234,6 +315,11 @@ namespace OOP_Lab_1.UI.Models
                 4 => "Admin",
                 _ => "Default"
             };
+        }
+
+        private string HashPassword(string password)
+        {
+            return password;
         }
     }
 }

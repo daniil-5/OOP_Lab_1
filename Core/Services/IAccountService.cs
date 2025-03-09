@@ -20,5 +20,7 @@ public interface IAccountService
     
     Task<bool> TransferAsync(string fromAccountId, string toAccountId, double amount);
     
+    Task<bool> UndoTransferAsync(string fromAccountId, string toAccountId, double amount);
+    
     Task<List<Transaction>> GetAllTransactionsAsync();
 }

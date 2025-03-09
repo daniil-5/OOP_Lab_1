@@ -207,25 +207,44 @@ public class UserRepository : IUserRepository
         }
     }
     
-    public async Task<bool> UserExistsByEmailAsync(string email, string bankId)
+    public async Task<User> UserExistsByEmailAsync(string email, string bankId)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             await connection.OpenAsync();
 
             var sql = @"
-            SELECT COUNT(*) 
-            FROM Users 
-            WHERE Email = @Email and BankId = @BankId;";
+        SELECT * 
+        FROM Users 
+        WHERE Email = @Email AND BankId = @BankId;";
 
             using (var command = new SqliteCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@Email", email);
                 command.Parameters.AddWithValue("@BankId", bankId);
 
-                // Execute the query and get the count of matching rows
-                var count = Convert.ToInt32(await command.ExecuteScalarAsync());
-                return count > 0; // Return true if a user with the email exists
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        var user = new User
+                        {
+                            Id = reader.GetInt32(0),
+                            FullName = reader.GetString(1),
+                            PassportNumber = reader.GetString(2),
+                            IdentificationNumber = reader.GetString(3),
+                            Phone = reader.GetString(4),
+                            Email = reader.GetString(5),
+                            Password = reader.GetString(6),
+                            Role = reader.GetInt32(7)
+                        };
+                        return user;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
             }
         }
     }
@@ -327,4 +346,323 @@ public class UserRepository : IUserRepository
         return HashPassword(inputPassword) == hashedPassword;
     }
     
+    public async Task<bool> AddExternalSpecialistAsync(int userId, int enterpriseId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            // SQL query to insert a new External Specialist
+            var sql = @"
+            INSERT INTO ExternalSpecialists (UserId, EnterpriseId)
+            VALUES (@UserId, @EnterpriseId);";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                // Add parameters
+                command.Parameters.AddWithValue("@UserId", userId);
+                command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+
+                // Execute the query
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+                return rowsAffected > 0; // Return true if the record was added successfully
+            }
+        }
+    }
+    
+    public async Task<int> GetEnterpriseIdByUserIdAsync(int userId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            // SQL query to retrieve the EnterpriseId for a given UserId
+            var sql = @"
+            SELECT EnterpriseId 
+            FROM ExternalSpecialists 
+            WHERE UserId = @UserId;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@UserId", userId);
+                
+                var result = await command.ExecuteScalarAsync();
+                if (result != null)
+                {
+                    return Convert.ToInt32(result);
+                }
+            }
+        }
+
+        return 0;
+    }
+    
+    public async Task<List<Enterprise>> GetEnterprisesAsync(string bankId)
+    {
+        Console.WriteLine("Entering GetEnterprises");
+        Console.WriteLine(bankId);
+        var enterprises = new List<Enterprise>();
+
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            
+            var sql = "SELECT * FROM Enterprises WHERE BIC = @BankId;";
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@BankId", bankId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var enterprise = new Enterprise
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            LegalName = reader.GetString(reader.GetOrdinal("LegalName")),
+                            Type = reader.GetString(reader.GetOrdinal("Type")),
+                            UNP = reader.GetString(reader.GetOrdinal("UNP")),
+                            BIC = reader.GetString(reader.GetOrdinal("BIC")),
+                            LegalAddress = reader.GetString(reader.GetOrdinal("LegalAddress"))
+                        };
+
+                        enterprises.Add(enterprise);
+                    }
+                }
+            }
+        }
+
+        return enterprises;
+    }
+    
+    public async Task<Enterprise> GetEnterpriseByIdAsync(int enterpriseId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = @"
+            SELECT Id, LegalName, Type, UNP, BIC, LegalAddress
+            FROM Enterprises
+            WHERE Id = @EnterpriseId;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return new Enterprise
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            LegalName = reader.GetString(reader.GetOrdinal("LegalName")),
+                            Type = reader.GetString(reader.GetOrdinal("Type")),
+                            UNP = reader.GetString(reader.GetOrdinal("UNP")),
+                            BIC = reader.GetString(reader.GetOrdinal("BIC")),
+                            LegalAddress = reader.GetString(reader.GetOrdinal("LegalAddress"))
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+    }
+    
+    public async Task<int> GetWorkerIdFromUserAsync(User user)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = @"
+            SELECT Id
+            FROM Workers
+            WHERE Full_Name = @FullName AND Email = @Email;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@FullName", user.FullName);
+                command.Parameters.AddWithValue("@Email", user.Email);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return reader.GetInt32(reader.GetOrdinal("Id"));
+                    }
+                    
+                    return 0;
+                }
+            }
+        }
+    }
+    
+    public async Task<int> IsConnectedToSalaryAsync(int workerId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = @"
+            SELECT ConnectedToSalary
+            FROM Workers
+            WHERE Id = @WorkerId;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@WorkerId", workerId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return reader.GetInt32(reader.GetOrdinal("ConnectedToSalary"));
+                    }
+                    return -1;
+                }
+            }
+        }
+    }
+    
+    public async Task<int> ConnectToSalaryAsync(int workerId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = @"
+            UPDATE Workers 
+            SET ConnectedToSalary = @ConnectedToSalary 
+            WHERE Id = @WorkerId;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@WorkerId", workerId);
+                command.Parameters.AddWithValue("@ConnectedToSalary", 1);
+                
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return reader.GetInt32(reader.GetOrdinal("ConnectedToSalary"));
+                    }
+                    return -1;
+                }
+            }
+        }
+    }
+    
+    public async Task<int> DisconnectFromSalaryAsync(int workerId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            var sql = @"
+            UPDATE Workers 
+            SET ConnectedToSalary = @ConnectedToSalary 
+            WHERE Id = @WorkerId;";
+
+            using (var command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@WorkerId", workerId);
+                command.Parameters.AddWithValue("@ConnectedToSalary", 0);
+                
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return reader.GetInt32(reader.GetOrdinal("ConnectedToSalary"));
+                    }
+                    return -1;
+                }
+            }
+        }
+    }
+    
+    public async Task<List<Worker>> GetConnectedToSalaryWorkersAsync()
+    {
+        var connectedWorkers = new List<Worker>();
+
+        try
+        {
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                var sql = @"
+                SELECT * FROM Workers
+                WHERE ConnectedToSalary = @ConnectedToSalary;";
+
+                using (var command = new SqliteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@ConnectedToSalary", 1);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var worker = new Worker
+                            {
+                                Id = reader.GetInt32(0),
+                                FullName = reader.GetString(1),
+                                Email = reader.GetString(2),
+                                Position = reader.GetString(3),
+                                Salary = reader.GetDouble(4)
+                            };
+                            connectedWorkers.Add(worker);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+
+        return connectedWorkers;
+    }
+    
+    public async Task<int> GetEnterpriseIdByWorkerIdAsync(int workerId)
+    {
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                var sql = @"
+            SELECT EnterpriseId
+            FROM WorkerEnterprise
+            WHERE WorkerId = @WorkerId;";
+
+                using (var command = new SqliteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@WorkerId", workerId);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return reader.GetInt32(reader.GetOrdinal("EnterpriseId"));
+                        }
+                    
+                        return 0;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+        }
+    }
 }

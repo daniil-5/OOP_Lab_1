@@ -429,6 +429,174 @@ public async Task<bool> TransferAsync(string fromAccountId, string toAccountId, 
     }
 }
 
+public async Task<bool> UndoTransferAsync(string fromAccountId, string toAccountId, double amount)
+{
+    // Validate input parameters
+    if (string.IsNullOrEmpty(fromAccountId))
+        throw new ArgumentException("Source account ID cannot be null or empty.", nameof(fromAccountId));
+
+    if (string.IsNullOrEmpty(toAccountId))
+        throw new ArgumentException("Destination account ID cannot be null or empty.", nameof(toAccountId));
+
+    if (amount <= 0)
+        throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+
+    // Check if source and destination accounts are the same
+    if (fromAccountId == toAccountId)
+    {
+        return false; // Undo denied: Source and destination accounts are the same
+    }
+
+    using (var connection = new SqliteConnection(_connectionString))
+    {
+        await connection.OpenAsync();
+
+        // Begin a transaction
+        using (var transaction = (SqliteTransaction)await connection.BeginTransactionAsync())
+        {
+            try
+            {
+                // Check source account status and balance
+                var fromAccountSql = @"
+                    SELECT Balance, IsBlocked, IsFrozen 
+                    FROM UserAccounts 
+                    WHERE AccountNumber = @FromAccountId;";
+
+                using (var fromAccountCommand = new SqliteCommand(fromAccountSql, connection, transaction))
+                {
+                    fromAccountCommand.Parameters.AddWithValue("@FromAccountId", fromAccountId);
+
+                    using (var fromAccountReader = await fromAccountCommand.ExecuteReaderAsync())
+                    {
+                        if (!await fromAccountReader.ReadAsync())
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Source account not found
+                        }
+
+                        double fromBalance = fromAccountReader.GetDouble(0);
+                        bool isFromBlocked = fromAccountReader.GetBoolean(1);
+                        bool isFromFrozen = fromAccountReader.GetBoolean(2);
+
+                        // Check if the source account is blocked or frozen
+                        if (isFromBlocked || isFromFrozen)
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Undo denied: Source account is blocked or frozen
+                        }
+                    }
+                }
+
+                // Check destination account status and balance
+                var toAccountSql = @"
+                    SELECT Balance, IsBlocked, IsFrozen 
+                    FROM UserAccounts 
+                    WHERE AccountNumber = @ToAccountId;";
+
+                using (var toAccountCommand = new SqliteCommand(toAccountSql, connection, transaction))
+                {
+                    toAccountCommand.Parameters.AddWithValue("@ToAccountId", toAccountId);
+
+                    using (var toAccountReader = await toAccountCommand.ExecuteReaderAsync())
+                    {
+                        if (!await toAccountReader.ReadAsync())
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Destination account not found
+                        }
+
+                        double toBalance = toAccountReader.GetDouble(0);
+                        bool isToBlocked = toAccountReader.GetBoolean(1);
+                        bool isToFrozen = toAccountReader.GetBoolean(2);
+
+                        // Check if the destination account is blocked or frozen
+                        if (isToBlocked || isToFrozen)
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Undo denied: Destination account is blocked or frozen
+                        }
+
+                        // Check if the destination account has sufficient funds to reverse the transfer
+                        if (toBalance < amount)
+                        {
+                            await transaction.RollbackAsync(); // Rollback the transaction
+                            return false; // Insufficient funds in the destination account
+                        }
+                    }
+                }
+
+                // Add the amount back to the source account
+                var addToSourceSql = @"
+                    UPDATE UserAccounts 
+                    SET Balance = Balance + @Amount 
+                    WHERE AccountNumber = @FromAccountId;";
+
+                using (var addToSourceCommand = new SqliteCommand(addToSourceSql, connection, transaction))
+                {
+                    addToSourceCommand.Parameters.AddWithValue("@Amount", amount);
+                    addToSourceCommand.Parameters.AddWithValue("@FromAccountId", fromAccountId);
+
+                    int addToSourceRowsAffected = await addToSourceCommand.ExecuteNonQueryAsync();
+                    if (addToSourceRowsAffected == 0)
+                    {
+                        await transaction.RollbackAsync(); // Rollback the transaction
+                        return false; 
+                    }
+                }
+
+                // Deduct the amount from the destination account
+                var deductFromDestinationSql = @"
+                    UPDATE UserAccounts 
+                    SET Balance = Balance - @Amount 
+                    WHERE AccountNumber = @ToAccountId;";
+
+                using (var deductFromDestinationCommand = new SqliteCommand(deductFromDestinationSql, connection, transaction))
+                {
+                    deductFromDestinationCommand.Parameters.AddWithValue("@Amount", amount);
+                    deductFromDestinationCommand.Parameters.AddWithValue("@ToAccountId", toAccountId);
+
+                    int deductFromDestinationRowsAffected = await deductFromDestinationCommand.ExecuteNonQueryAsync();
+                    if (deductFromDestinationRowsAffected == 0)
+                    {
+                        await transaction.RollbackAsync(); // Rollback the transaction
+                        return false; 
+                    }
+                }
+
+                // Delete the transfer record from the Transfers table
+                var deleteTransferSql = @"
+                    DELETE FROM Transfers 
+                    WHERE FromAccountId = @FromAccountId 
+                      AND ToAccountId = @ToAccountId 
+                      AND Amount = @Amount 
+                      AND Status = 'Success';";
+
+                using (var deleteTransferCommand = new SqliteCommand(deleteTransferSql, connection, transaction))
+                {
+                    deleteTransferCommand.Parameters.AddWithValue("@FromAccountId", fromAccountId);
+                    deleteTransferCommand.Parameters.AddWithValue("@ToAccountId", toAccountId);
+                    deleteTransferCommand.Parameters.AddWithValue("@Amount", amount);
+
+                    int deleteRowsAffected = await deleteTransferCommand.ExecuteNonQueryAsync();
+                    if (deleteRowsAffected == 0)
+                    {
+                        await transaction.RollbackAsync(); // Rollback the transaction
+                        return false; // No matching transfer record found
+                    }
+                }
+
+                await transaction.CommitAsync(); // Commit the transaction
+                return true; // Undo transfer successful
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); // Rollback the transaction in case of an error
+                throw; // Re-throw the exception
+            }
+        }
+    }
+}
+
 public async Task<bool> RefillAsync(string accountId, double amount)
 {
     if (string.IsNullOrEmpty(accountId))

@@ -1,200 +1,149 @@
 using OOP_Lab_1.Core.Entities;
 using OOP_Lab_1.Core.Interfaces;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
-
+using OOP_Lab_1.Core.Entities.Repositories;
+using Serilog;
 
 namespace OOP_Lab_1.Core.Services;
 
 public class BanksService : IBanksService
 {
-    private readonly string _connectionString;
+    private readonly IBankRepository _bankRepository;
+    private readonly ILogger _logger;
 
-    public BanksService(string databasePath)
+    public BanksService(IBankRepository bankRepository)
     {
-        _connectionString = $"Data Source={databasePath}";
-        InitializeBanksDatabase();
+        _bankRepository = bankRepository;
+        _logger = Log.ForContext<BanksService>();
     }
-    
-    public async Task CreateBankTableAsync(string id)
-    {
-        using (var connection = new SqliteConnection(_connectionString))
-        {
-            await connection.OpenAsync();
-            
-            var sql = $@"
-            CREATE TABLE IF NOT EXISTS {id} (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                FullName TEXT NOT NULL,
-                PassportNumber TEXT NOT NULL,
-                IdentificationNumber TEXT NOT NULL,
-                Phone TEXT NOT NULL,
-                Email TEXT NOT NULL UNIQUE,
-                Password TEXT NOT NULL,
-                Role INTEGER NOT NULL
-            );";
 
-            using (var command = new SqliteCommand(sql, connection))
+    public async Task<bool> CreateBankTableAsync(string id)
+    {
+        _logger.Information("Creating bank table for Bank ID: {BankId}", id);
+
+        try
+        {
+            bool result = await _bankRepository.CreateBankTableAsync(id);
+
+            if (result)
             {
-                await command.ExecuteNonQueryAsync();
+                _logger.Information("Bank table created successfully for Bank ID: {BankId}", id);
             }
+            else
+            {
+                _logger.Warning("Failed to create bank table for Bank ID: {BankId}", id);
+            }
+
+            return result;
         }
-    }
-    
-    private void InitializeBanksDatabase()
-    {
-        using (var connection = new SqliteConnection(_connectionString))
+        catch (Exception ex)
         {
-            connection.Open();
+            _logger.Error(ex, "An error occurred while creating bank table for Bank ID: {BankId}", id);
+            throw;
         }
     }
 
     public async Task<List<(string BankId, string BankName)>> GetBanksAsync()
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        _logger.Information("Fetching list of banks.");
+
+        try
         {
-            await connection.OpenAsync();
+            var banks = await _bankRepository.GetBanksAsync();
 
-            var sql = "SELECT BIC, Name FROM Banks"; 
+            _logger.Information("Successfully fetched {BankCount} banks.", banks.Count);
 
-            using (var command = new SqliteCommand(sql, connection))
-            {
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    var banks = new List<(string, string)>();
-
-                    while (await reader.ReadAsync())
-                    {
-                        string bankId = reader.GetString(0);
-                        string bankName = reader.GetString(1);
-                        banks.Add((bankId, bankName));
-                    }
-
-                    return banks;
-                }
-            }
+            return banks;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while fetching banks.");
+            throw;
         }
     }
 
     public async Task<bool> AddBankAsync(Bank bank)
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        _logger.Information("Adding new bank: {BankName} (BIC: {BIC})", bank.Name, bank.BIC);
+
+        try
         {
-            await connection.OpenAsync();
+            bool result = await _bankRepository.AddBankAsync(bank);
 
-            var sql = "INSERT INTO Banks (Name, BIC) " +
-                      "VALUES (@Name, @BIC)";
-
-            using (var command = new SqliteCommand(sql, connection))
+            if (result)
             {
-                command.Parameters.AddWithValue("@Name", bank.Name);
-                command.Parameters.AddWithValue("@BIC", bank.BIC);
-
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-                return rowsAffected > 0;
+                _logger.Information("Bank {BankName} (BIC: {BIC}) added successfully.", bank.Name, bank.BIC);
             }
+            else
+            {
+                _logger.Warning("Failed to add bank {BankName} (BIC: {BIC}).", bank.Name, bank.BIC);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while adding bank {BankName} (BIC: {BIC}).", bank.Name, bank.BIC);
+            throw;
         }
     }
+
     public async Task<bool> RemoveBankAsync(string bankName)
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        _logger.Information("Removing bank: {BankName}", bankName);
+
+        if (bankName == null)
         {
-            await connection.OpenAsync();
-
-            var sql = "DELETE FROM Banks WHERE Name = @Name";
-
-            using (var command = new SqliteCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@Name", bankName);
-
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-                return rowsAffected > 0;
-            }
-        }
-    }
-    public async Task<bool> UpdateBankAsync(Bank bank)
-    {
-        if (bank == null || string.IsNullOrEmpty(bank.Name))
-        {
-            throw new ArgumentNullException(nameof(bank), "Bank or name cannot be null.");
+            _logger.Error("Bank name is null.");
+            throw new ArgumentNullException(nameof(bankName));
         }
 
         try
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            bool result = await _bankRepository.RemoveBankAsync(bankName);
+
+            if (result)
             {
-                await connection.OpenAsync();
-
-                var sql = "UPDATE Banks SET BIC = @BIC WHERE Name = @Name";
-
-                using (var command = new SqliteCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@BIC", bank.BIC);
-                    command.Parameters.AddWithValue("@Name", bank.Name);
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-                    return rowsAffected > 0;
-                }
+                _logger.Information("Bank {BankName} removed successfully.", bankName);
             }
+            else
+            {
+                _logger.Warning("Failed to remove bank {BankName}.", bankName);
+            }
+
+            return result;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating bank: {ex.Message}");
-            return false;
+            _logger.Error(ex, "An error occurred while removing bank {BankName}.", bankName);
+            throw;
         }
     }
-    public async Task CreateAccountTableAsync()
+
+    public async Task<bool> UpdateBankAsync(Bank bank)
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        _logger.Information("Updating bank: {BankName} (BIC: {BIC})", bank.Name, bank.BIC);
+
+        try
         {
-            await connection.OpenAsync();
+            bool result = await _bankRepository.UpdateBankAsync(bank);
 
-            var sql = @"
-                CREATE TABLE IF NOT EXISTS UserAccounts (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    AccountNumber TEXT NOT NULL UNIQUE,
-                    Balance REAL NOT NULL,
-                    IsBlocked BOOLEAN DEFAULT 0,
-                    IsFrozen BOOLEAN DEFAULT 0,
-                    UserEmail TEXT NOT NULL,
-                    BIC TEXT NOT NULL                                                         
-                );";
-
-            using (var command = new SqliteCommand(sql, connection))
+            if (result)
             {
-                await command.ExecuteNonQueryAsync();
+                _logger.Information("Bank {BankName} (BIC: {BIC}) updated successfully.", bank.Name, bank.BIC);
             }
+            else
+            {
+                _logger.Warning("Failed to update bank {BankName} (BIC: {BIC}).", bank.Name, bank.BIC);
+            }
+
+            return result;
         }
-    }
-    public async Task CreateLoanTableAsync()
-    {
-        using (var connection = new SqliteConnection(_connectionString))
+        catch (Exception ex)
         {
-            await connection.OpenAsync();
-
-            var sql = @"
-                CREATE TABLE IF NOT EXISTS Loans (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    LoanId TEXT NOT NULL UNIQUE,
-                    TypeOfLoan INTEGER NOT NULL,
-                    TypeOfPercent INTEGER NOT NULL,
-                    Percent REAL NOT NULL,
-                    Amount REAL NOT NULL,
-                    DurationMonths INTEGER NOT NULL,
-                    Purpose TEXT NOT NULL,
-                    Approved BOOLEAN DEFAULT 0,
-                    UserEmail TEXT NOT NULL,
-                    BIC TEXT NOT NULL,
-                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                );";
-
-            using (var command = new SqliteCommand(sql, connection))
-            {
-                await command.ExecuteNonQueryAsync();
-            }
+            _logger.Error(ex, "An error occurred while updating bank {BankName} (BIC: {BankId}).", bank.Name, bank.BIC);
+            throw;
         }
     }
 }

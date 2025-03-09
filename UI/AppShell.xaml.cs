@@ -20,6 +20,11 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("refillBalance", typeof(RefilAccountPage));
         Routing.RegisterRoute("UserApprovement", typeof(RegistrationApprovalPage));
         Routing.RegisterRoute("transactionStat", typeof(TransactionStatisticsPage));
+        Routing.RegisterRoute("submitSalary", typeof(SubmitSalaryProjectPage));
+        Routing.RegisterRoute("approveSalary", typeof(SalaryApprovalPage));
+        Routing.RegisterRoute("applyForSalary", typeof(ApplyForSalaryPage));
+        Routing.RegisterRoute("connectedToSalary", typeof(ConnectedToSalaryPage));
+        Routing.RegisterRoute("showLogs", typeof(LogsPage));
         GoToLoginPage();
     }
     private async void GoToLoginPage()

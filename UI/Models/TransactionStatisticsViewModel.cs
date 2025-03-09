@@ -30,13 +30,9 @@ public class TransactionStatisticsViewModel : BaseViewModel
         }
     }
     
-    // Reject Transaction
     private async Task UndoTransaction(Transaction transaction)
     {
-        // await _accountService.DeleteUserAsync(user.Id);
-        // TO DO implement the undo of transaction and return money to account
-        Console.WriteLine("Rejecting transaction");
         Transactions.Remove(transaction);
-        //LoadTransactions();
+        await _accountService.UndoTransferAsync(transaction.FromAccountId, transaction.ToAccountId, transaction.Amount);
     }
 }
